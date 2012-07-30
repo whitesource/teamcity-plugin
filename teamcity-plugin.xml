@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<teamcity-plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:noNamespaceSchemaLocation="urn:shemas-jetbrains-com:teamcity-plugin-v1-xml">
+    <info>
+        <name>whitesource</name>
+        <display-name>White Source</display-name>
+        <version>${project.version}</version>
+        <description>
+            <![CDATA[Provides automatic syncronization of OSS usage information to White Source.]]>
+        </description>
+        <download-url>http://docs.whitesourcesoftware.com/display/serviceDocs/TeamCity+plugin</download-url>
+        <email>support@whitesourcesoftware.com</email>
+        <vendor>
+            <name>White Source Ltd.</name>
+            <url>http://docs.whitesourcesoftware.com/display/serviceDocs/TeamCity+plugin</url>
+            <logo>http://www.whitesourcesoftware.com/sites/default/files/whitesource-logo.png</logo>
+        </vendor>
+    </info>
+    <deployment use-separate-classloader="false"/>
+</teamcity-plugin>

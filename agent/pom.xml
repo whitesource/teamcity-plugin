@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.whitesource.teamcity</groupId>
+        <artifactId>parent</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>agent</artifactId>
+
+    <properties>
+        <agents.version>1.0.0</agents.version>
+    </properties>
+
+    <dependencies>
+
+        <!-- White Source -->
+        <dependency>
+            <groupId>org.whitesource.teamcity</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.whitesource</groupId>
+            <artifactId>wss-agent-api</artifactId>
+            <version>${agents.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.whitesource</groupId>
+            <artifactId>wss-agent-api-client</artifactId>
+            <version>${agents.version}</version>
+        </dependency>
+
+        <!-- Teamcity -->
+        <dependency>
+            <groupId>org.jetbrains.teamcity.agent</groupId>
+            <artifactId>agent</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.teamcity.agent</groupId>
+            <artifactId>agent-openapi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.teamcity.agent</groupId>
+            <artifactId>annotations</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.teamcity.agent</groupId>
+            <artifactId>common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.teamcity.agent</groupId>
+            <artifactId>common-runtime</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.teamcity.agent</groupId>
+            <artifactId>runtime-util</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.teamcity.agent</groupId>
+            <artifactId>server-logging</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.teamcity.tomcat</groupId>
+            <artifactId>annotations-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.teamcity.webapp</groupId>
+            <artifactId>annotations</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.teamcity.webapp</groupId>
+            <artifactId>common-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.teamcity.webapp</groupId>
+            <artifactId>server-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.teamcity.webapp</groupId>
+            <artifactId>spring</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.teamcity.webapp</groupId>
+            <artifactId>util</artifactId>
+        </dependency>
+
+        <!-- Utilties -->
+        <dependency>
+            <groupId>org.jdom</groupId>
+            <artifactId>jdom</artifactId>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>Package</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <configuration>
+                            <finalName>teamcity-whitesource-plugin-agent-${project.version}</finalName>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+</project>

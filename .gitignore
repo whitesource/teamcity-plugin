@@ -1,1 +1,7 @@
 target/
+
+/.idea
+/common/target
+/agent/target
+/server/target
+/assembly/target
