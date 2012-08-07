@@ -4,12 +4,11 @@ import com.thoughtworks.xstream.XStream;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.ServerPaths;
 import jetbrains.buildServer.util.FileUtil;
+import jetbrains.buildServer.util.XmlUtil;
 import org.jetbrains.annotations.NotNull;
 import org.whitesource.teamcity.common.WssUtils;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.*;
 
 /**
  * Global configuration for the plugin.
@@ -41,6 +40,8 @@ public class GlobalSettingsManager {
      */
     public GlobalSettingsManager(@NotNull ServerPaths serverPaths) {
         xStream = new XStream();
+        xStream.processAnnotations(GlobalSettings.class);
+        xStream.setClassLoader(GlobalSettings.class.getClassLoader());
 
         configFile = new File(serverPaths.getConfigDir(), CONFIG_FILE_NAME);
         loadConfig();
@@ -49,22 +50,30 @@ public class GlobalSettingsManager {
     /* --- Private methods --- */
 
     public void save() {
-        FileOutputStream outputStream = null;
+        FileOutputStream fos = null;
         try {
-            outputStream = new FileOutputStream(configFile);
-            xStream.toXML(globalSettings, outputStream);
+            fos = new FileOutputStream(configFile);
+            xStream.toXML(globalSettings, fos);
         } catch (FileNotFoundException e) {
             Loggers.SERVER.error(WssUtils.logMsg(LOG_COMPONENT,"Failed to save config file " + configFile), e);
         } finally {
-            FileUtil.close(outputStream);
+            FileUtil.close(fos);
         }
     }
 
     /* --- Private methods --- */
 
-    private void loadConfig() {
+    private void loadConfig(){
         if (configFile.exists()) {
-            globalSettings = (GlobalSettings) xStream.fromXML(configFile);
+            FileInputStream fis = null;
+            try {
+                fis = new FileInputStream(configFile);
+                globalSettings = (GlobalSettings) xStream.fromXML(fis);
+            } catch (IOException e) {
+                Loggers.SERVER.error(WssUtils.logMsg(LOG_COMPONENT,"Failed to load config file " + configFile), e);
+            } finally {
+                FileUtil.close(fis);
+            }
         }
     }
 

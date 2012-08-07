@@ -3,6 +3,7 @@ package org.whitesource.teamcity.server;
 import jetbrains.buildServer.serverSide.BuildStartContext;
 import jetbrains.buildServer.serverSide.BuildStartContextProcessor;
 import jetbrains.buildServer.serverSide.SRunnerContext;
+import jetbrains.buildServer.serverSide.TeamCityProperties;
 import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.whitesource.teamcity.common.Constants;
@@ -46,15 +47,19 @@ public class WhitesourceBuildStartContextProcessor implements BuildStartContextP
 
         for (SRunnerContext runnerContext : context.getRunnerContexts()) {
             // activate plugin
-            runnerContext.addRunnerParameter(Constants.UPDATE_WHITESOURCE, Boolean.TRUE.toString());
+            runnerContext.addRunnerParameter(Constants.RUNNER_DO_UPDATE, Boolean.TRUE.toString());
 
-            runnerContext.addRunnerParameter(Constants.ORGANIZATION_TOKEN, orgToken);
+            // system envrionment
+            runnerContext.addRunnerParameter(Constants.RUNNER_SERVICE_URL, TeamCityProperties.getProperty(Constants.RUNNER_SERVICE_URL));
+
+            // global settings
+            runnerContext.addRunnerParameter(Constants.RUNNER_ORGANIZATION_TOKEN, orgToken);
 
             if (proxy != null) {
-                runnerContext.addRunnerParameter(Constants.PROXY_HOST, proxy.getHost());
-                runnerContext.addRunnerParameter(Constants.PROXY_PORT, Integer.valueOf(proxy.getPort()).toString());
-                runnerContext.addRunnerParameter(Constants.PROXY_USERNAME, proxy.getUsername());
-                runnerContext.addRunnerParameter(Constants.PROXY_PASSWORD, proxy.getPassword());
+                runnerContext.addRunnerParameter(Constants.RUNNER_PROXY_HOST, proxy.getHost());
+                runnerContext.addRunnerParameter(Constants.RUNNER_PROXY_PORT, Integer.valueOf(proxy.getPort()).toString());
+                runnerContext.addRunnerParameter(Constants.RUNNER_PROXY_USERNAME, proxy.getUsername());
+                runnerContext.addRunnerParameter(Constants.RUNNER_PROXY_PASSWORD, proxy.getPassword());
             }
 
         }

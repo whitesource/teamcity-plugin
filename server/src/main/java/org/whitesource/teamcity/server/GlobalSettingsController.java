@@ -5,6 +5,7 @@ import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.util.StringUtil;
 import org.jdom.Element;
 import org.springframework.web.servlet.ModelAndView;
+import org.whitesource.teamcity.common.Constants;
 import org.whitesource.teamcity.common.WssUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -43,26 +44,23 @@ public class GlobalSettingsController extends BaseFormXmlController {
     protected void doPost(HttpServletRequest request, HttpServletResponse response, Element xmlResponse) {
         Loggers.SERVER.info(WssUtils.logMsg("GlobalSettingsController", "doPost"));
 
-        if (settingsManager.getGlobalSettings() == null) {
-            settingsManager.setGlobalSettings(new GlobalSettings());
-        }
-        settingsManager.getGlobalSettings().setOrgToken(request.getParameter("orgToken"));
+        final GlobalSettings settings = new GlobalSettings();
 
-        String proxyHost = request.getParameter("proxyHost");
-        if (!StringUtil.isEmptyOrSpaces(proxyHost)) {
-            if (settingsManager.getGlobalSettings().getProxy() == null) {
-                settingsManager.getGlobalSettings().setProxy(new ProxySettings());
-            }
-            settingsManager.getGlobalSettings().getProxy().setHost(proxyHost);
-            settingsManager.getGlobalSettings().getProxy().setUsername(request.getParameter("proxyUsername"));
-            settingsManager.getGlobalSettings().getProxy().setPassword(request.getParameter("proxyPassword"));
-            String proxyPort = request.getParameter("proxyPort");
-            if (StringUtil.isNumber(proxyPort)) {
-                settingsManager.getGlobalSettings().getProxy().setPort(Integer.parseInt(proxyPort));
-            }
-        }
+        settings.setOrgToken(request.getParameter("orgToken"));
 
+        ProxySettings proxy = new ProxySettings();
+        proxy.setHost(request.getParameter("proxyHost"));
+        proxy.setUsername(request.getParameter("proxyPort"));
+        proxy.setPassword(request.getParameter("proxyUsername"));
+        String proxyPort = request.getParameter("proxyPassword");
+        if (StringUtil.isNumber(proxyPort)) {
+            proxy.setPort(Integer.parseInt(proxyPort));
+        }
+        settings.setProxy(proxy);
+
+        settingsManager.setGlobalSettings(settings);
         settingsManager.save();
+
         getOrCreateMessages(request).addMessage("settingsSaved", "White Source global settings were saved.");
     }
 }

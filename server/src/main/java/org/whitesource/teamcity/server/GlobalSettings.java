@@ -15,6 +15,15 @@ public class GlobalSettings {
     @XStreamAlias("Proxy")
     private ProxySettings proxy;
 
+    /* --- Constructors--- */
+
+    /**
+     * Default constructor
+     */
+    public GlobalSettings() {
+        proxy = new ProxySettings();
+    }
+
     /* --- Getters / Setters --- */
 
     public String getOrgToken() {

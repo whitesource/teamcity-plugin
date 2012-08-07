@@ -3,7 +3,7 @@ package org.whitesource.teamcity.agent;
 import com.intellij.openapi.diagnostic.Logger;
 import jetbrains.buildServer.agent.*;
 import jetbrains.buildServer.log.Loggers;
-import jetbrains.buildServer.messages.BuildMessage1;
+import jetbrains.buildServer.serverSide.TeamCityProperties;
 import jetbrains.buildServer.util.EventDispatcher;
 import jetbrains.buildServer.util.FileUtil;
 import jetbrains.buildServer.util.StringUtil;
@@ -12,10 +12,14 @@ import org.jdom.JDOMException;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jetbrains.annotations.NotNull;
+import org.whitesource.agent.api.ChecksumUtils;
+import org.whitesource.agent.api.dispatch.UpdateInventoryResult;
 import org.whitesource.agent.api.model.AgentProjectInfo;
 import org.whitesource.agent.api.model.Coordinates;
 import org.whitesource.agent.api.model.DependencyInfo;
-import org.whitesource.teamcity.common.ChecksumUtils;
+import org.whitesource.api.client.ClientConstants;
+import org.whitesource.api.client.WhitesourceService;
+import org.whitesource.api.client.WssServiceException;
 import org.whitesource.teamcity.common.Constants;
 import org.whitesource.teamcity.common.WssUtils;
 
@@ -24,7 +28,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Edo.Shor
@@ -60,38 +63,48 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
     public void beforeRunnerStart(@NotNull BuildRunnerContext runner) {
         super.beforeRunnerStart(runner);
 
-        Loggers.AGENT.info(WssUtils.logMsg(LOG_COMPONENT, "before runner start " + runner.getBuild().getProjectName() + " type " + runner.getName()));
+        Loggers.AGENT.info(WssUtils.logMsg(LOG_COMPONENT, "before runner start "
+                + runner.getBuild().getProjectName() + " type " + runner.getName()));
 
         if (!shouldUpdate(runner)) {
             return; // no need to update white source...
         }
-
     }
 
     @Override
     public void runnerFinished(@NotNull BuildRunnerContext runner, @NotNull BuildFinishedStatus status) {
         super.runnerFinished(runner, status);
-        Loggers.AGENT.info(WssUtils.logMsg(LOG_COMPONENT, "runner finished " + runner.getBuild().getProjectName() + " type " + runner.getName()));
+        Loggers.AGENT.info(WssUtils.logMsg(LOG_COMPONENT, "runner finished "
+                + runner.getBuild().getProjectName() + " type " + runner.getName()));
 
         if (!shouldUpdate(runner)) {
             return; // no need to update white source...
         }
 
-        runner.getBuild().getBuildLogger().message("Updating White Source");
+        final BuildProgressLogger buildLogger = runner.getBuild().getBuildLogger();
+        buildLogger.message("Updating White Source");
 
         // collect OSS usage information
-        runner.getBuild().getBuildLogger().message("Collecting OSS usage information");
+        buildLogger.message("Collecting OSS usage information");
         Collection<AgentProjectInfo> projectInfos = new ArrayList<AgentProjectInfo>();
         if (WssUtils.isMavenRunType(runner.getRunType())) {
             projectInfos = doMaven(runner);
         }
-        dumpAgentProjectInfos(projectInfos);
+        debugAgentProjectInfos(projectInfos);
 
         // send to white source
-        runner.getBuild().getBuildLogger().message("Sending to White Source");
-        projectInfos.size();
-
-        runner.getBuild().getBuildLogger().message("Successfully update White Source.");
+        buildLogger.message("Sending to White Source");
+        WhitesourceService service = createServiceClient(runner);
+        try{
+            final String orgToken = runner.getRunnerParameters().get(Constants.RUNNER_ORGANIZATION_TOKEN);
+            final UpdateInventoryResult updateResult = service.update(orgToken, projectInfos);
+            logUpdateResult(updateResult, buildLogger);
+            buildLogger.message("Successfully update White Source.");
+        } catch (WssServiceException e) {
+            stopBuild(runner, e);
+        } finally {
+            service.shutdown();
+        }
     }
 
     /* --- Private methods --- */
@@ -109,7 +122,7 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
             String missingMavenInfo = "Can't find maven build info report.";
             Loggers.AGENT.warn(WssUtils.logMsg(LOG_COMPONENT, missingMavenInfo));
             build.getBuildLogger().warning(missingMavenInfo);
-            throw new RuntimeException("Error collecting maven information. Skipping update.");
+            throw new RuntimeException("Error collecting maven information, Skipping update.");
         }
 
         // parse maven info report and extract OSS usage information
@@ -169,11 +182,48 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
     }
 
     private boolean shouldUpdate(BuildRunnerContext runner) {
-        String shouldUpdate = runner.getRunnerParameters().get(Constants.UPDATE_WHITESOURCE);
-        return StringUtil.isEmptyOrSpaces(shouldUpdate) || !Boolean.valueOf(shouldUpdate);
+        String shouldUpdate = runner.getRunnerParameters().get(Constants.RUNNER_DO_UPDATE);
+        return !StringUtil.isEmptyOrSpaces(shouldUpdate) && Boolean.valueOf(shouldUpdate);
     }
 
-    private void dumpAgentProjectInfos(Collection<AgentProjectInfo> projectInfos) {
+    private WhitesourceService createServiceClient(BuildRunnerContext runner) {
+        String serviceUrl = runner.getRunnerParameters().get(Constants.RUNNER_SERVICE_URL);
+        WhitesourceService service = new WhitesourceService(Constants.AGENT_TYPE, Constants.AGENT_VERSION, serviceUrl);
+
+        String proxyHost = runner.getRunnerParameters().get(Constants.RUNNER_PROXY_HOST);
+        if (!StringUtil.isEmptyOrSpaces(proxyHost)) {
+            int port = Integer.parseInt(runner.getRunnerParameters().get(Constants.RUNNER_PROXY_PORT));
+            String username = runner.getRunnerParameters().get(Constants.RUNNER_PROXY_USERNAME);
+            String password = runner.getRunnerParameters().get(Constants.RUNNER_PROXY_PASSWORD);
+            service.getClient().setProxy(proxyHost, port, username, password);
+        }
+
+        return service;
+    }
+
+    private void logUpdateResult(UpdateInventoryResult result, BuildProgressLogger logger) {
+        Loggers.AGENT.info(WssUtils.logMsg(LOG_COMPONENT, "update success"));
+
+        logger.message("White Source update results: ");
+        logger.message("White Source organization: " + result.getOrganization());
+        logger.message(result.getCreatedProjects().size() + " Newly created projects:");
+        StringUtil.join(result.getCreatedProjects(), ",");
+        logger.message(result.getUpdatedProjects().size() + " existing projects were updated:");
+        StringUtil.join(result.getUpdatedProjects(), ",");
+    }
+
+    private void stopBuild(BuildRunnerContext runner, Exception e) {
+        Loggers.AGENT.warn(WssUtils.logMsg(LOG_COMPONENT, "Stopping build"), e);
+
+        BuildProgressLogger logger = runner.getBuild().getBuildLogger();
+        String errorMessage = e.getLocalizedMessage();
+        logger.buildFailureDescription(errorMessage);
+        logger.exception(e);
+        logger.flush();
+        ((AgentRunningBuildEx) runner.getBuild()).stopBuild(errorMessage);
+    }
+
+    private void debugAgentProjectInfos(Collection<AgentProjectInfo> projectInfos) {
         final Logger log = Loggers.AGENT;
 
         log.info("----------------- dumping projectInfos -----------------");
