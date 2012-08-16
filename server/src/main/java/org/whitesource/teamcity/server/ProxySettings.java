@@ -17,6 +17,15 @@ public class ProxySettings {
 
     private String password;
 
+    /* --- Constructors --- */
+
+    /**
+     * Default constructor
+     */
+    public ProxySettings() {
+        port = -1;
+    }
+
     /* --- Getters / Setters --- */
 
     public String getHost() {

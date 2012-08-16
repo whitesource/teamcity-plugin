@@ -21,7 +21,6 @@ public class GlobalSettings {
      * Default constructor
      */
     public GlobalSettings() {
-        proxy = new ProxySettings();
     }
 
     /* --- Getters / Setters --- */

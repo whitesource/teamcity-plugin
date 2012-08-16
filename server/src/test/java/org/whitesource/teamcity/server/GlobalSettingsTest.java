@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.UUID;
 
 /**
  * @author Edo.Shor
@@ -16,7 +17,7 @@ public class GlobalSettingsTest {
 
     @Test
     public void testSettingsPersistence() {
-        GlobalSettings settings = new GlobalSettings();
+         GlobalSettings settings = new GlobalSettings();
         settings.setOrgToken("orgToken");
 
         GlobalSettings tmpSettings = saveAndLoad(settings);

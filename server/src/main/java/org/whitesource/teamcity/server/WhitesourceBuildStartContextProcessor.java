@@ -4,6 +4,7 @@ import jetbrains.buildServer.serverSide.BuildStartContext;
 import jetbrains.buildServer.serverSide.BuildStartContextProcessor;
 import jetbrains.buildServer.serverSide.SRunnerContext;
 import jetbrains.buildServer.serverSide.TeamCityProperties;
+import jetbrains.buildServer.serverSide.crypt.RSACipher;
 import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.whitesource.teamcity.common.Constants;
@@ -39,18 +40,12 @@ public class WhitesourceBuildStartContextProcessor implements BuildStartContextP
         }
 
         String orgToken = globalSettings.getOrgToken();
-        if (StringUtil.isEmptyOrSpaces(orgToken)) {
-//            TODO: implement
-        }
-
         ProxySettings proxy = globalSettings.getProxy();
 
         for (SRunnerContext runnerContext : context.getRunnerContexts()) {
-            // activate plugin
-            runnerContext.addRunnerParameter(Constants.RUNNER_DO_UPDATE, Boolean.TRUE.toString());
-
             // system envrionment
-            runnerContext.addRunnerParameter(Constants.RUNNER_SERVICE_URL, TeamCityProperties.getProperty(Constants.RUNNER_SERVICE_URL));
+            runnerContext.addRunnerParameter(Constants.RUNNER_SERVICE_URL,
+                    TeamCityProperties.getProperty(Constants.RUNNER_SERVICE_URL));
 
             // global settings
             runnerContext.addRunnerParameter(Constants.RUNNER_ORGANIZATION_TOKEN, orgToken);
@@ -59,7 +54,12 @@ public class WhitesourceBuildStartContextProcessor implements BuildStartContextP
                 runnerContext.addRunnerParameter(Constants.RUNNER_PROXY_HOST, proxy.getHost());
                 runnerContext.addRunnerParameter(Constants.RUNNER_PROXY_PORT, Integer.valueOf(proxy.getPort()).toString());
                 runnerContext.addRunnerParameter(Constants.RUNNER_PROXY_USERNAME, proxy.getUsername());
-                runnerContext.addRunnerParameter(Constants.RUNNER_PROXY_PASSWORD, proxy.getPassword());
+
+                String password = proxy.getPassword();
+                if (!StringUtil.isEmptyOrSpaces(password)) {
+                    password = RSACipher.encryptData(password);
+                }
+                runnerContext.addRunnerParameter(Constants.RUNNER_PROXY_PASSWORD, password);
             }
 
         }

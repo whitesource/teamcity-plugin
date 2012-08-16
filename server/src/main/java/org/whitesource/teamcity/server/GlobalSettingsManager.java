@@ -3,7 +3,9 @@ package org.whitesource.teamcity.server;
 import com.thoughtworks.xstream.XStream;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.ServerPaths;
+import jetbrains.buildServer.serverSide.crypt.RSACipher;
 import jetbrains.buildServer.util.FileUtil;
+import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.util.XmlUtil;
 import org.jetbrains.annotations.NotNull;
 import org.whitesource.teamcity.common.WssUtils;
@@ -47,7 +49,7 @@ public class GlobalSettingsManager {
         loadConfig();
     }
 
-    /* --- Private methods --- */
+    /* --- Public methods --- */
 
     public void save() {
         FileOutputStream fos = null;
@@ -59,6 +61,16 @@ public class GlobalSettingsManager {
         } finally {
             FileUtil.close(fos);
         }
+    }
+
+    public boolean isProxy() {
+
+        return globalSettings.getProxy() != null &&
+                !StringUtil.isEmptyOrSpaces(globalSettings.getProxy().getHost());
+    }
+
+    public String getHexEncodedPublicKey() {
+        return RSACipher.getHexEncodedPublicKey();
     }
 
     /* --- Private methods --- */

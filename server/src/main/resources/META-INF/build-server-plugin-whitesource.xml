@@ -16,4 +16,10 @@
     <bean id="globalSettingsTab" class="org.whitesource.teamcity.server.GlobalSettingsTab"/>
 
     <bean id="whitesourceBuildStartContextProcessor" class="org.whitesource.teamcity.server.WhitesourceBuildStartContextProcessor"/>
+
+    <bean id="mavenRunTypeExtension" class="org.whitesource.teamcity.server.runner.MavenRunTypeExtension"
+              depends-on="globalSettingsManager"/>
+
+    <bean id="genericRunTypeExtension" class="org.whitesource.teamcity.server.runner.GenericRunTypeExtension"
+                  depends-on="globalSettingsManager"/>
 </beans>
