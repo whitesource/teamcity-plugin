@@ -1,7 +1,11 @@
-target/
 
 /.idea
+*.iml
+
+target/
+
 /common/target
 /agent/target
 /server/target
 /assembly/target
+
