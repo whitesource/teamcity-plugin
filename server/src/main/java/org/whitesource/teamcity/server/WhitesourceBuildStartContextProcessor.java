@@ -54,12 +54,7 @@ public class WhitesourceBuildStartContextProcessor implements BuildStartContextP
                 runnerContext.addRunnerParameter(Constants.RUNNER_PROXY_HOST, proxy.getHost());
                 runnerContext.addRunnerParameter(Constants.RUNNER_PROXY_PORT, Integer.valueOf(proxy.getPort()).toString());
                 runnerContext.addRunnerParameter(Constants.RUNNER_PROXY_USERNAME, proxy.getUsername());
-
-                String password = proxy.getPassword();
-                if (!StringUtil.isEmptyOrSpaces(password)) {
-                    password = RSACipher.encryptData(password);
-                }
-                runnerContext.addRunnerParameter(Constants.RUNNER_PROXY_PASSWORD, password);
+                runnerContext.addRunnerParameter(Constants.RUNNER_PROXY_PASSWORD, proxy.getPassword());
             }
 
         }

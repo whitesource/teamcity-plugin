@@ -126,10 +126,6 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
             int port = Integer.parseInt(runner.getRunnerParameters().get(Constants.RUNNER_PROXY_PORT));
             String username = runner.getRunnerParameters().get(Constants.RUNNER_PROXY_USERNAME);
             String password = runner.getRunnerParameters().get(Constants.RUNNER_PROXY_PASSWORD);
-            if (!StringUtil.isEmptyOrSpaces(password)) {
-                password = RSACipher.decryptData(password);
-            }
-
             service.getClient().setProxy(proxyHost, port, username, password);
         }
 
