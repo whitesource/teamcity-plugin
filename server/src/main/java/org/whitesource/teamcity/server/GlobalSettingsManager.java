@@ -6,7 +6,6 @@ import jetbrains.buildServer.serverSide.ServerPaths;
 import jetbrains.buildServer.serverSide.crypt.RSACipher;
 import jetbrains.buildServer.util.FileUtil;
 import jetbrains.buildServer.util.StringUtil;
-import jetbrains.buildServer.util.XmlUtil;
 import org.jetbrains.annotations.NotNull;
 import org.whitesource.teamcity.common.WssUtils;
 
@@ -57,15 +56,15 @@ public class GlobalSettingsManager {
             fos = new FileOutputStream(configFile);
             xStream.toXML(globalSettings, fos);
         } catch (FileNotFoundException e) {
-            Loggers.SERVER.error(WssUtils.logMsg(LOG_COMPONENT,"Failed to save config file " + configFile), e);
+            Loggers.SERVER.error(WssUtils.logMsg(LOG_COMPONENT, "Failed to save config file " + configFile), e);
         } finally {
             FileUtil.close(fos);
         }
     }
 
     public boolean isProxy() {
-
-        return globalSettings.getProxy() != null &&
+        return globalSettings != null &&
+                globalSettings.getProxy() != null &&
                 !StringUtil.isEmptyOrSpaces(globalSettings.getProxy().getHost());
     }
 
@@ -75,14 +74,14 @@ public class GlobalSettingsManager {
 
     /* --- Private methods --- */
 
-    private void loadConfig(){
+    private void loadConfig() {
         if (configFile.exists()) {
             FileInputStream fis = null;
             try {
                 fis = new FileInputStream(configFile);
                 globalSettings = (GlobalSettings) xStream.fromXML(fis);
             } catch (IOException e) {
-                Loggers.SERVER.error(WssUtils.logMsg(LOG_COMPONENT,"Failed to load config file " + configFile), e);
+                Loggers.SERVER.error(WssUtils.logMsg(LOG_COMPONENT, "Failed to load config file " + configFile), e);
             } finally {
                 FileUtil.close(fis);
             }
