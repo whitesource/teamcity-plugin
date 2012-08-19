@@ -64,7 +64,7 @@
         <td>
             <props:multilineProperty name="org.whitesource.includes" linkTitle="Filesets to include" rows="3" cols="60"/>
             <span class="smallNote">
-                Comma or line separated list of Ant-style filesets to include in update.
+                Comma or line separated list of Ant-style filesets to include in update. Relative to checkout directory.
             </span>
         </td>
     </tr>
@@ -77,7 +77,7 @@
         <td>
             <props:multilineProperty name="org.whitesource.excludes" linkTitle="Filesets to exclude" rows="3" cols="60"/>
             <span class="smallNote">
-                Comma or line separated list of Ant-style filesets to exclude form update.
+                Comma or line separated list of Ant-style filesets to exclude form update. Relative to checkout directory.
             </span>
         </td>
     </tr>
