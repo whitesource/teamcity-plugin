@@ -7,6 +7,7 @@
 
     function toggleSettings() {
         $('containerOverrideOrgToken').toggle();
+        $('containerOverrideCheckPolicies').toggle();
         $('containerProjectToken').toggle();
         $('containerModuleTokens').toggle();
         $('containerIncludes').toggle();
@@ -40,6 +41,19 @@
             <props:textProperty name="org.whitesource.overrideOrgToken" size="55"/>
             <span class="smallNote">
                 Organization token to use instead of global settings.
+            </span>
+        </td>
+    </tr>
+    <tr id="containerOverrideCheckPolicies" style="${showSettings ? '' : 'display: none;'}">
+        <th>
+            Override policies check:
+        </th>
+        <td>
+            <props:radioButtonProperty name="org.whitesource.overrideCheckPolicies" value="global"/> Use Global Settings
+            <props:radioButtonProperty name="org.whitesource.overrideCheckPolicies" value="enable"/> Enable
+            <props:radioButtonProperty name="org.whitesource.overrideCheckPolicies" value="disable"/> Disable
+            <span class="smallNote">
+                Override check policies in global settings.
             </span>
         </td>
     </tr>

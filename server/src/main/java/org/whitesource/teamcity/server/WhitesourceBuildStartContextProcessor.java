@@ -40,6 +40,7 @@ public class WhitesourceBuildStartContextProcessor implements BuildStartContextP
         }
 
         String orgToken = globalSettings.getOrgToken();
+        boolean checkPolicies = globalSettings.isCheckPolicies();
         ProxySettings proxy = globalSettings.getProxy();
 
         for (SRunnerContext runnerContext : context.getRunnerContexts()) {
@@ -49,6 +50,7 @@ public class WhitesourceBuildStartContextProcessor implements BuildStartContextP
 
             // global settings
             runnerContext.addRunnerParameter(Constants.RUNNER_ORGANIZATION_TOKEN, orgToken);
+            runnerContext.addRunnerParameter(Constants.RUNNER_CHECK_POLICIES, Boolean.toString(checkPolicies));
 
             if (proxy != null) {
                 runnerContext.addRunnerParameter(Constants.RUNNER_PROXY_HOST, proxy.getHost());
@@ -56,7 +58,6 @@ public class WhitesourceBuildStartContextProcessor implements BuildStartContextP
                 runnerContext.addRunnerParameter(Constants.RUNNER_PROXY_USERNAME, proxy.getUsername());
                 runnerContext.addRunnerParameter(Constants.RUNNER_PROXY_PASSWORD, proxy.getPassword());
             }
-
         }
 
     }

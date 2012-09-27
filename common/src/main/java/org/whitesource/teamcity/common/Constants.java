@@ -17,6 +17,8 @@ public final class Constants {
     public final static String RUNNER_DO_UPDATE = PLUGIN_PREFIX + "doUpdate";
     public final static String RUNNER_ORGANIZATION_TOKEN = PLUGIN_PREFIX + "orgToken";
     public final static String RUNNER_OVERRIDE_ORGANIZATION_TOKEN = PLUGIN_PREFIX + "overrideOrgToken";
+    public final static String RUNNER_CHECK_POLICIES = PLUGIN_PREFIX + "checkPolicies";
+    public final static String RUNNER_OVERRIDE_CHECK_POLICIES = PLUGIN_PREFIX + "overrideCheckPolicies";
     public final static String RUNNER_PROJECT_TOKEN = PLUGIN_PREFIX + "projectToken";
     public final static String RUNNER_MODULE_TOKENS = PLUGIN_PREFIX + "moduleTokens";
     public final static String RUNNER_INCLUDES = PLUGIN_PREFIX + "includes";

@@ -94,6 +94,25 @@
                         <div class="smallNote" style="margin-left: 0;">Unique identifier of the organization to update.</div>
                     </td>
                 </tr>
+                <tr class="groupingTitle">
+                    <td colspan="2">Check policies</td>
+                </tr>
+                <tr>
+                    <th>
+                        <label for="checkPolicies">
+                            Check policies
+                            <bs:helpIcon iconTitle="Require premium account."/>
+                        </label>
+                    </th>
+                    <td>
+                        <forms:checkbox name="checkPolicies" checked="${settingsManager.globalSettings.checkPolicies}"/>
+                        <div class="smallNote" style="margin-left: 0;">
+                            Fail the build if an open source library is rejected by an organization policy.
+                            <br/>
+                            <b>Note:</b> In such cases, no update will take place on White Source.
+                        </div>
+                    </td>
+                </tr>
             </table>
             <br/>
             <div id="useProxy">

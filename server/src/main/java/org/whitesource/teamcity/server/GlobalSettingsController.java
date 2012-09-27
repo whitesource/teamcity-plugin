@@ -58,8 +58,8 @@ public class GlobalSettingsController extends BaseFormXmlController {
         }
 
         final GlobalSettings settings = new GlobalSettings();
-
         settings.setOrgToken(request.getParameter("orgToken"));
+        settings.setCheckPolicies(Boolean.parseBoolean(request.getParameter("checkPolicies")));
 
         String proxyHost = request.getParameter("proxyHost");
         if (!StringUtil.isEmptyOrSpaces(proxyHost)){

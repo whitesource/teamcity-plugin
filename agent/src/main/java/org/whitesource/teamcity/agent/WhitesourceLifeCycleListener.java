@@ -1,13 +1,18 @@
 package org.whitesource.teamcity.agent;
 
 import com.intellij.openapi.diagnostic.Logger;
+import jetbrains.buildServer.ExtensionHolder;
 import jetbrains.buildServer.agent.*;
 import jetbrains.buildServer.log.Loggers;
-import jetbrains.buildServer.serverSide.crypt.RSACipher;
+import jetbrains.buildServer.util.ArchiveUtil;
 import jetbrains.buildServer.util.EventDispatcher;
 import jetbrains.buildServer.util.StringUtil;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.Velocity;
+import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.util.CollectionUtils;
+import org.whitesource.agent.api.dispatch.CheckPoliciesResult;
 import org.whitesource.agent.api.dispatch.UpdateInventoryResult;
 import org.whitesource.agent.api.model.AgentProjectInfo;
 import org.whitesource.agent.api.model.DependencyInfo;
@@ -16,7 +21,16 @@ import org.whitesource.api.client.WssServiceException;
 import org.whitesource.teamcity.common.Constants;
 import org.whitesource.teamcity.common.WssUtils;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.zip.ZipOutputStream;
 
 /**
  * @author Edo.Shor
@@ -27,14 +41,19 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
 
     private static final String LOG_COMPONENT = "LifeCycleListener";
 
+    private ExtensionHolder extensionHolder;
+
     /* --- Constructors --- */
 
     /**
      * Constructor
      *
      * @param eventDispatcher
+     * @param extensionHolder
      */
-    public WhitesourceLifeCycleListener(@NotNull final EventDispatcher<AgentLifeCycleListener> eventDispatcher) {
+    public WhitesourceLifeCycleListener(@NotNull final EventDispatcher<AgentLifeCycleListener> eventDispatcher,
+                                        @NotNull final ExtensionHolder extensionHolder) {
+        this.extensionHolder = extensionHolder;
         eventDispatcher.addListener(this);
     }
 
@@ -60,14 +79,16 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
     public void runnerFinished(@NotNull BuildRunnerContext runner, @NotNull BuildFinishedStatus status) {
         super.runnerFinished(runner, status);
 
+        AgentRunningBuild build = runner.getBuild();
+
         Loggers.AGENT.info(WssUtils.logMsg(LOG_COMPONENT, "runner finished "
-                + runner.getBuild().getProjectName() + " type " + runner.getName()));
+                + build.getProjectName() + " type " + runner.getName()));
 
         if (!shouldUpdate(runner)) {
             return; // no need to update white source...
         }
 
-        final BuildProgressLogger buildLogger = runner.getBuild().getBuildLogger();
+        final BuildProgressLogger buildLogger = build.getBuildLogger();
         buildLogger.message("Updating White Source");
 
         // make sure we have an organization token
@@ -76,9 +97,19 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
             orgToken = runner.getRunnerParameters().get(Constants.RUNNER_ORGANIZATION_TOKEN);
         }
         if (StringUtil.isEmptyOrSpaces(orgToken)) {
-            stopBuild(runner, new IllegalStateException("Empty organization token. " +
-                    "Please make sure an organization token is defined for this runner"));
+            stopBuildOnError((AgentRunningBuildEx) build,
+                    new IllegalStateException("Empty organization token. " +
+                            "Please make sure an organization token is defined for this runner"));
             return;
+        }
+
+        // should we check policies first ?
+        boolean shouldCheckPolicies = false;
+        String overrideCheckPolicies = runner.getRunnerParameters().get(Constants.RUNNER_OVERRIDE_CHECK_POLICIES);
+        if ("global".equals(overrideCheckPolicies)) {
+            shouldCheckPolicies = Boolean.parseBoolean(runner.getRunnerParameters().get(Constants.RUNNER_CHECK_POLICIES));
+        } else {
+            shouldCheckPolicies = "enabled".equals(overrideCheckPolicies);
         }
 
         // collect OSS usage information
@@ -96,18 +127,64 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
         if (CollectionUtils.isEmpty(projectInfos)) {
             buildLogger.message("No open source information found.");
         } else {
-            buildLogger.message("Sending to White Source");
             WhitesourceService service = createServiceClient(runner);
             try{
-                final UpdateInventoryResult updateResult = service.update(orgToken, projectInfos);
-                logUpdateResult(updateResult, buildLogger);
-                buildLogger.message("Successfully updated White Source.");
+                if (shouldCheckPolicies) {
+                    buildLogger.message("Checking policies");
+                    CheckPoliciesResult result = service.checkPolicies(orgToken, projectInfos);
+                    policiesRejectionsReport(runner, result);
+                    if (result.hasRejections()) {
+                        stopBuild((AgentRunningBuildEx) build, "Open source rejected by organization policies.");
+                    } else {
+                        buildLogger.message("All dependencies conform with open source policies.");
+                        sendUpdate(orgToken, projectInfos, service, buildLogger);
+                    }
+                } else {
+                    sendUpdate(orgToken, projectInfos, service, buildLogger);
+                }
             } catch (WssServiceException e) {
-                stopBuild(runner, e);
+                stopBuildOnError((AgentRunningBuildEx) build, e);
+            } catch (IOException e) {
+                stopBuildOnError((AgentRunningBuildEx) build, e);
+            } catch (RuntimeException e) {
+                Loggers.AGENT.error(WssUtils.logMsg(LOG_COMPONENT, "Runtime Error"), e);
+                stopBuildOnError((AgentRunningBuildEx) build, e);
             } finally {
                 service.shutdown();
             }
         }
+    }
+
+    private void policiesRejectionsReport(BuildRunnerContext runner, CheckPoliciesResult result) throws IOException {
+        AgentRunningBuild build = runner.getBuild();
+        File reportDir = new File(build.getBuildTempDirectory(), "whitesource");
+        reportDir.mkdirs();
+
+        // generate report
+        Velocity.setProperty(Velocity.RESOURCE_LOADER, "classpath");
+        Velocity.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
+        Velocity.init();
+
+        VelocityContext context = new VelocityContext();
+        context.put("buildName", build.getProjectName());
+        context.put("buildNumber", build.getBuildNumber());
+        context.put("creationTime", SimpleDateFormat.getInstance().format(new Date()));
+        context.put("result", result);
+        context.put("hasRejections", result.hasRejections());
+
+        FileWriter fw = new FileWriter(new File(reportDir, "index.html"));
+        Velocity.mergeTemplate("templates/policy-check.vm", "UTF-8", context, fw);
+        fw.flush();
+        fw.close();
+
+        // pack report and send to server
+        File reportArchive = new File(build.getBuildTempDirectory(), "whitesource.zip");
+        ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(reportArchive));
+        ArchiveUtil.packZip(reportDir, zos);
+        ArtifactsPublisher publisher = extensionHolder.getExtensions(ArtifactsPublisher.class).iterator().next();
+        Map<File, String> artifactsToPublish = new HashMap<File, String>();
+        artifactsToPublish.put(reportArchive, "");
+        publisher.publishFiles(artifactsToPublish);
     }
 
     /* --- Private methods --- */
@@ -132,6 +209,15 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
         return service;
     }
 
+    private void sendUpdate(String orgToken, Collection<AgentProjectInfo> projectInfos,
+                            WhitesourceService service, BuildProgressLogger buildLogger)
+            throws WssServiceException {
+
+        buildLogger.message("Sending to White Source");
+        UpdateInventoryResult updateResult = service.update(orgToken, projectInfos);
+        logUpdateResult(updateResult, buildLogger);
+    }
+
     private void logUpdateResult(UpdateInventoryResult result, BuildProgressLogger logger) {
         Loggers.AGENT.info(WssUtils.logMsg(LOG_COMPONENT, "update success"));
 
@@ -143,15 +229,24 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
         StringUtil.join(result.getUpdatedProjects(), ",");
     }
 
-    private void stopBuild(BuildRunnerContext runner, Exception e) {
+    private void stopBuildOnError(AgentRunningBuildEx build, Exception e) {
         Loggers.AGENT.warn(WssUtils.logMsg(LOG_COMPONENT, "Stopping build"), e);
 
-        BuildProgressLogger logger = runner.getBuild().getBuildLogger();
+        BuildProgressLogger logger = build.getBuildLogger();
         String errorMessage = e.getLocalizedMessage();
         logger.buildFailureDescription(errorMessage);
         logger.exception(e);
         logger.flush();
-        ((AgentRunningBuildEx) runner.getBuild()).stopBuild(errorMessage);
+        build.stopBuild(errorMessage);
+    }
+
+    private void stopBuild(AgentRunningBuildEx build, String message) {
+        Loggers.AGENT.warn(WssUtils.logMsg(LOG_COMPONENT, "Stopping build: + message"));
+
+        BuildProgressLogger logger = build.getBuildLogger();
+        logger.buildFailureDescription(message);
+        logger.flush();
+        build.stopBuild(message);
     }
 
     private void debugAgentProjectInfos(Collection<AgentProjectInfo> projectInfos) {

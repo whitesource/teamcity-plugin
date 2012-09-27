@@ -49,6 +49,7 @@ public abstract class BaseRunTypeExtension extends RunTypeExtension {
 
         defaultRunnerParams = new HashMap<String, String>();
         defaultRunnerParams.put(Constants.RUNNER_IGNORE_POM_MODULES, "true");
+        defaultRunnerParams.put(Constants.RUNNER_OVERRIDE_CHECK_POLICIES, "global");
     }
 
     /* --- Concrete implementation methods --- */

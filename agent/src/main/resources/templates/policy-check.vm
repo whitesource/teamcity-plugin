@@ -1,0 +1,136 @@
+#macro( reject ) <span style="color:#ff0000;">Rejections found</span> #end
+#macro( approve ) <span style="color:#00ff00;">All approved</span> #end
+#macro( rejectSingle ) <span style="color:#ff0000;">rejected</span> #end
+#macro( approveSingle ) <span style="color:#00ff00;">approved</span> #end
+
+#macro (projectsSummary $projects)
+    #foreach ($entry in $projects.entrySet())
+        #set( $detailsId = "project-details-$foreach.count")
+
+        <div style="width: 700px; padding-left: 10px;">
+
+            ## project caption
+            <div style="width: 100%; border: 1px black solid;">
+                <div style="display: inline-block; padding-left: 10px;"><h3>$entry.key</h3></div>
+
+                <div style="display: inline-block; padding-left: 10px">
+                    #if ( $entry.value.hasRejections() )
+                        #reject()
+                    #else
+                        #approve()
+                    #end
+                </div>
+
+                <a href="#" onclick="toggleDetails(this, '$detailsId')" style="float:right;"> show details</a>
+            </div>
+
+            ## project details
+            <div id="$detailsId" style="width: 100%; border: 1px black solid; display: none;">
+                #projectDependenciesTree($entry.value)
+            </div>
+        </div>
+
+    #end
+#end
+
+#macro ( projectDependenciesTree $root)
+    <ul>
+        #foreach ($child in $root.children)
+            #dependencyNode ($child)
+        #end
+    </ul>
+#end
+
+#macro ( dependencyNode $node)
+    <li>
+        <span>
+            <a href="$node.resource.link" target="_blank">$node.resource.displayName</a>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            #foreach ($license in $node.resource.licenses)
+                $license &nbsp;
+            #end
+
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            #if ($node.policy)
+                #if ("Reject" == $node.policy.actionType)
+                    #rejectSingle()
+                #else
+                    #approveSingle()
+                #end
+            #end
+        </span>
+
+        #if ( $node.children )
+            <ul>
+            #foreach ($child in $node.children)
+                #dependencyNode ($child)
+            #end
+            </ul>
+        #end
+    </li>
+#end
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>White Source - Policy Check Summary</title>
+        <meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type" />
+
+        <script>
+            function toggleDetails(anchor, detailsId){
+                var details = document.getElementById(detailsId);
+
+                if(details.style.display == 'block' ) {
+                    details.style.display = 'none';
+                    anchor.innerHTML = 'show details'
+                }
+                else {
+                    details.style.display = 'block';
+                    anchor.innerHTML = 'hide details'
+                }
+
+                return details;
+            }
+        </script>
+    </head>
+
+    <body>
+        <a href="http://www.whitesourcesoftware.com">
+            <img align="left" src="http://saas.whitesourcesoftware.com/Wss/background/WhiteSource_Logo.png" style="left: 10;" />
+        </a>
+
+        <div align="center">
+            <h1> &nbsp;</h1>
+            <h1>Policy Check Summary</h1>
+            <h2>
+                #if ( $hasRejections )
+                    #reject()
+                #else
+                    #approve()
+                #end
+            </h2>
+
+            <br/>
+
+            <table border="1" cellpadding="1" cellspacing="1" style="width: 500px;">
+                <caption>General details</caption>
+                <tbody>
+                    <tr><td>Build Name</td><td>$buildName</td></tr>
+                    <tr><td>Build Number</td><td>$buildNumber</td></tr>
+                    <tr><td>Report creation time</td><td>$creationTime</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <br/>
+
+        <h2 style="display: inline-block">New projects</h2>
+        <span style="padding-left: 10px" >found $result.newProjects.size() new projects </span>
+        #projectsSummary($result.newProjects)
+
+        <h2 style="display: inline-block">Existing projects</h2>
+        <span style="padding-left: 10px" >found $result.existingProjects.size() existing projects </span>
+        #projectsSummary($result.existingProjects)
+
+    </body>
+</html>

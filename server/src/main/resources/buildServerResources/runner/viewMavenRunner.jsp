@@ -22,6 +22,12 @@
             <c:out value="${empty overrideOrgToken ? 'from global configuration' : overrideOrgToken}"/>
         </strong>
     </div>
+    <div class="nestedParameter" style="${doUpdate ? '' : 'display:none;'}">
+        Check policies:
+        <strong>
+            <c:out value="${empty overrideCheckPolicies ? 'from global configuration' : overrideCheckPolicies}"/>
+        </strong>
+    </div>
     <div class="nestedParameter" style="${doUpdate and not empty projectToken ? '' : 'display:none;'}">
         Project token:
         <strong>

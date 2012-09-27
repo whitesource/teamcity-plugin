@@ -12,6 +12,8 @@ public class GlobalSettings {
 
     private String orgToken;
 
+    private boolean checkPolicies;
+
     @XStreamAlias("Proxy")
     private ProxySettings proxy;
 
@@ -31,6 +33,14 @@ public class GlobalSettings {
 
     public void setOrgToken(String orgToken) {
         this.orgToken = orgToken;
+    }
+
+    public boolean isCheckPolicies() {
+        return checkPolicies;
+    }
+
+    public void setCheckPolicies(boolean checkPolicies) {
+        this.checkPolicies = checkPolicies;
     }
 
     public ProxySettings getProxy() {
