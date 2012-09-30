@@ -9,3 +9,17 @@ target/
 /server/target
 /assembly/target
 
+
+/.settings
+/.project
+/agent/.project
+/agent/.settings
+/agent/.classpath
+/assembly/.project
+/assembly/.settings
+/common/.project
+/common/.settings
+/common/.classpath
+/server/.project
+/server/.settings
+/server/.classpath
