@@ -226,9 +226,9 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
         logger.message("White Source update results: ");
         logger.message("White Source organization: " + result.getOrganization());
         logger.message(result.getCreatedProjects().size() + " Newly created projects:");
-        StringUtil.join(result.getCreatedProjects(), ",");
+        logger.message(StringUtil.join(result.getCreatedProjects(), ","));
         logger.message(result.getUpdatedProjects().size() + " existing projects were updated:");
-        StringUtil.join(result.getUpdatedProjects(), ",");
+        logger.message(StringUtil.join(result.getUpdatedProjects(), ","));
     }
 
     private void stopBuildOnError(AgentRunningBuildEx build, Exception e) {
