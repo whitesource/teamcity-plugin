@@ -12,6 +12,7 @@
     <name>White Source plugin for JetBrains TeamCity</name>
     <description>White Source external update agent for the TeamCity CI tool</description>
     <url>https://github.com/whitesource/teamcity-plugin</url>
+    <inceptionYear>2012</inceptionYear>
 
     <licenses>
         <license>
@@ -191,6 +192,26 @@
     </dependencyManagement>
 
     <build>
+        <plugins>
+            <plugin>
+                <groupId>com.mycila.maven-license-plugin</groupId>
+                <artifactId>maven-license-plugin</artifactId>
+                <configuration>
+                    <aggregate>true</aggregate>
+                    <header>src/etc/header.txt</header>
+                    <strictCheck>true</strictCheck>
+                    <encoding>UTF-8</encoding>
+                    <properties>
+                        <year>${project.inceptionYear}</year>
+                    </properties>
+                    <excludes>
+                        <exclude>.idea/**</exclude>
+                        <exclude>LICENSE.txt</exclude>
+                        <exclude>**/site/**</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -214,6 +235,11 @@
                     <groupId>org.whitesource</groupId>
                     <artifactId>whitesource-maven-plugin</artifactId>
                     <version>1.1.2</version>
+                </plugin>
+                <plugin>
+                    <groupId>com.mycila.maven-license-plugin</groupId>
+                    <artifactId>maven-license-plugin</artifactId>
+                    <version>1.9.0</version>
                 </plugin>
             </plugins>
         </pluginManagement>

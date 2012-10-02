@@ -1,7 +1,32 @@
+#*
+ * Copyright (C) 2012 White Source Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *#
 #macro( reject ) <span class='wssRed'>Rejections found</span> #end
 #macro( approve ) <span class='wssGreen'>All approved</span> #end
-#macro( rejectSingle $policyName ) <span class='wssRed'>rejected by policy $policyName</span> #end
-#macro( approveSingle $policyName ) <span class='wssGreen'>approved by policy $policyName</span> #end
+#macro( rejectSingle $policyName ) 
+	<div style="float: right;">
+		<span class='wssRed'>REJECTED</span>
+		<span class='wssAnchor' title="Rejected by policy $policyName">info</span>
+	</div>
+#end
+#macro( approveSingle $policyName )
+<div style="float: right;">
+	<span class='wssGreen'>APPROVED</span>
+	<span class='wssAnchor' title="Approved by policy $policyName">info</span>
+</div>
+#end
 #macro( lineSeparator ) <div class='wssLineSeparaterContainer'><div class='wssLineSeparator'></div></div> #end
 
 #macro (projectsSummary $projects $detailsPrefix)
@@ -46,14 +71,14 @@
 
 #macro ( dependencyNode $node)
     <li>
-        <span>
+        <div class="wssDependencyNode">
             <a class='wssAnchor' href="$node.resource.link" target="_blank">$node.resource.displayName</a>
-            &nbsp;&nbsp;&nbsp;&nbsp;
+            <div class="wssTextColor" style="display: inline; padding-left: 20px;">
             #foreach ($license in $node.resource.licenses)
                 $license &nbsp;
             #end
+			</div>
 
-            &nbsp;&nbsp;&nbsp;&nbsp;
             #if ($node.policy)
                 #if ("Reject" == $node.policy.actionType)
                     #rejectSingle( $node.policy.displayName )
@@ -61,7 +86,7 @@
                     #approveSingle( $node.policy.displayName )
                 #end
             #end
-        </span>
+        </div>
 
         #if ( $node.children )
             <ul>
@@ -156,6 +181,57 @@
 		    </div>
 	        #projectsSummary($result.existingProjects "existing-project")
         </div>
+
+		#lineSeparator
+
+		#if ( $licenses.size() > 0 )
+		<div class='wssTextAlign' style="margin: 10px;">
+			<div style='padding-bottom: 1px;'>
+				<span class='wssLicenseIcon'></span>
+		        <div class='wssProjectHeader' style="display: inline-block">License distribution</div>
+	       </div>
+			<table class="wssLicenses wssTextColor">
+		  		<tr>
+		  			#foreach ( $license in $licenses )
+		      		<td style='width: 100px; padding: 0px; vertical-align: bottom;'>
+		      			<table style="border-spacing: 0px 0px; width:100px; text-align:center">
+		                	<tr>
+		                    	<td style=' font-size:12px;'>
+		                      		$license.occurrences
+		                    	<td>
+		                  	</tr>
+		                  	<tr>
+		                    	<td style="padding-bottom:0px; padding-right:40px; padding-left:40px">
+		                      		<table height="$license.height" class="wssLicenseBar" title="$license.name: $license.occurrences">
+		                        		<tr>
+		                          			<td>
+		                          			</td>
+		                        		</tr>
+		                      		</table>
+		                    	</td>
+		                  	</tr>
+		            	</table>
+		    		</td>
+		    		#end
+		  		</tr>
+		  	</table>
+		  	<table style='width: 100%;'>
+		  		<tr>
+		  			#foreach ( $license in $licenses )
+		    		<td>
+		    			<table style='width: 100px;'>
+		                  <tr>
+		                    <td class="wssTextColor" style='font-size:80%; text-align:center;' title="$license.name">
+		        				$license.shortName
+		                    </td>
+		                  </tr>
+		                </table>
+		      		</td>
+		      		#end
+				</tr>
+			</table>
+		</div>
+		#end
 
 	</div>
 	</div>
