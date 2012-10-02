@@ -55,7 +55,7 @@
 
             &nbsp;&nbsp;&nbsp;&nbsp;
             #if ($node.policy)
-                #if ("REJECT" == $node.policy.actionType)
+                #if ("Reject" == $node.policy.actionType)
                     #rejectSingle( $node.policy.displayName )
                 #else
                     #approveSingle( $node.policy.displayName )

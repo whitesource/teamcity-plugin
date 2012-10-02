@@ -6,6 +6,7 @@ import jetbrains.buildServer.agent.*;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.util.ArchiveUtil;
 import jetbrains.buildServer.util.EventDispatcher;
+import jetbrains.buildServer.util.FileUtil;
 import jetbrains.buildServer.util.StringUtil;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
@@ -21,10 +22,7 @@ import org.whitesource.api.client.WssServiceException;
 import org.whitesource.teamcity.common.Constants;
 import org.whitesource.teamcity.common.WssUtils;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
@@ -132,7 +130,7 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
                 if (shouldCheckPolicies) {
                     buildLogger.message("Checking policies");
                     CheckPoliciesResult result = service.checkPolicies(orgToken, projectInfos);
-                    policiesRejectionsReport(runner, result);
+                    policyCheckReport(runner, result);
                     if (result.hasRejections()) {
                         stopBuild((AgentRunningBuildEx) build, "Open source rejected by organization policies.");
                     } else {
@@ -155,7 +153,7 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
         }
     }
 
-    private void policiesRejectionsReport(BuildRunnerContext runner, CheckPoliciesResult result) throws IOException {
+    private void policyCheckReport(BuildRunnerContext runner, CheckPoliciesResult result) throws IOException {
         AgentRunningBuild build = runner.getBuild();
         File reportDir = new File(build.getBuildTempDirectory(), "whitesource");
         reportDir.mkdirs();
@@ -176,6 +174,10 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
         Velocity.mergeTemplate("templates/policy-check.vm", "UTF-8", context, fw);
         fw.flush();
         fw.close();
+
+        // copy report resources
+        File resource = new File(reportDir, "wss.css");
+        FileUtil.copyResourceIfNotExists(getClass(), "/templates/wss.css", resource);
 
         // pack report and send to server
         File reportArchive = new File(build.getBuildTempDirectory(), "whitesource.zip");
