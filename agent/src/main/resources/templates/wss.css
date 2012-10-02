@@ -36,6 +36,7 @@
 
 .wssAnchor {
 	color: #019ADD;
+	text-decoration: underline;
 }
 
 .wssAnchor:link {
@@ -111,6 +112,14 @@
 	display: inline-block;
 }
 
+.wssLicenseIcon {
+	height: 24px;
+	width: 24px;
+	overflow: hidden;
+	background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAEDklEQVR42p2Ve2xTdRTHb+J/Jho1/APZylyiTOZjRmJ8y0vidPiKEwWFKHEKOmMCCYS/mCOBtboxN8Vt7R7d3Fh1lL4fG1s7Ch2jD6wMmI089pClne4FbUfbezy/X3tvbm+7ZeEkn9zb3+93vuf8zvndXxlmEVN7v33A5Nv7vMZTukfrLe3UuL/QqRH9hW/kZt++rQbv7gLmbk3r/brupHtXROPZHUdgAWLIfyrnh28tWfiE+9Mitatk/ITrc1gqaoK7pGfA/+P9i4qTTH4b3AEIm3wm2Q6qwU8w413IV/R3gh0itkdVp4slmcUHtr3feW4rpLINus5/BuevyuHc379ALD4P0VgEPNeVOKagZRL7HB/4KKpzldybKg6qe9qdxTMdzg9YBDga+zfB7ci/sJgpHUWAviD06zhbbEkJ0OLY7Gw78w4IOT6wBa4G7FSEZVm4FQ6A+1oj0gTTt0dxLE7nhm+aoMu1E33eTvFvcRQWUnGlffPDLY6iGMIiQFDYN8KtSJDP8tTQQWg+/QZSSFHYN4Dxjz20XMTibAzkOMb5J3hzkgZotm/a2YSlEFLf9xLMhMao85V/DFiq1/g5ue1V+HNEBY0oeGGkna65EwtBXe8LINKJNdk3PsE02NZqFfb1IOSk+0s+e9Xgx/y43LYWXFim8SkPfW/uL+RLaPHtA7GOwrb+XQaznajvexmEOP211InYTz1raE3JiSFOxEgjybpqy+N8gIujv9NdCHXqel+sZI6deg4QNvmk4FHj60uOXlP/6/T94lgXeK61QG3303RdI/aKGDm+ZNdCjQTPdjIkQzFV5tUQnp+mzteDDhR8BlpxF+HoLDTY1tE1ZOzyuJZvcpX5sTSdn3vWdDC13U/N1lgLQEiVeRUEZy7z27dfqaBZV+izcC6Plqb3UjnfJ3LiKk2PglinprugnTlqyXcgkM5qsPoO8CLReBj8E90wNKbG93l+vHfoO7qWBM2g8ytTacnbfxS3l4kjuhUwFRpZ8CueDo3SNQv5V5vy2hiZadWTP5geiSMsAmLq+16BeDzKnyrOSGOrMctMPhxYtlb6scmMuYHvjbkg5jBmxzWSWGB2GMJ3pmgwQtuZ9yCTH4fMkJsIUGHNXiE15IDMmMMi5AlShHz+Qqu25oMLb1bO5kI34ZB2GXA+aZhWKvkL74heUlahz8aTks2Sp9QggRuTZ3kxci0c1i2HMvV9EMHjypnFtx+SfunospQptyqKHiPCJEgNHsvJub8giGWZnPNDA/YiOQc6bykE54Yp/gkrliKHzomRGSTKtD8eqVFSlhDKgnLNg2y55iEgkN+cI9kJN35Iswy4HS8pAO2JhvRkZQAXxTI5LpUFA/B9MUvypXpJKS7uR4J3EaT1f2LLgrwM5W8yAAAAAElFTkSuQmCC") -0px -0px no-repeat;
+	display: inline-block;
+}
+
 .wssLineSeparator {
 	height: 1px;
 	background: lightGrey;
@@ -119,4 +128,28 @@
 .wssLineSeparaterContainer {
 	margin: 10px;
 	padding-top: 10px;
+}
+
+.wssLicenseBar {
+	border-spacing: 0px 0px;
+	background: #019ADD;
+	width: 20px;
+	border-radius: 2px 2px 0px 0px;
+}
+
+.wssLicenses {
+	border-spacing: 0px 0px;
+	width:100%;
+	height: 115px;
+	border-left: 1px solid #ccc;
+	border-bottom: 1px solid #ccc;
+	font-size: 12px;
+	background: aliceblue;
+}
+
+.wssDependencyNode {
+	border-bottom: 1px dashed #ddd;
+	padding-bottom: 4px;
+	padding-top: 4px;
+	margin-right: 10px;
 }
