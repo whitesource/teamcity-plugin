@@ -17,6 +17,9 @@ package org.whitesource.teamcity.server;
 
 import jetbrains.buildServer.serverSide.SBuild;
 import jetbrains.buildServer.serverSide.SBuildServer;
+import jetbrains.buildServer.serverSide.artifacts.BuildArtifact;
+import jetbrains.buildServer.serverSide.artifacts.BuildArtifacts;
+import jetbrains.buildServer.serverSide.artifacts.BuildArtifactsViewMode;
 import jetbrains.buildServer.web.openapi.PagePlaces;
 import jetbrains.buildServer.web.openapi.ViewLogTab;
 import org.jetbrains.annotations.NotNull;
@@ -58,5 +61,21 @@ public class PolicyCheckReportTab extends ViewLogTab {
     protected void fillModel(Map model, HttpServletRequest request, @Nullable SBuild build) {
         model.put("basePath", TAB_BASEPATH);
         model.put("startPage", TAB_STARTPAGE);
+    }
+
+    /* --- Overridden methods --- */
+
+    @Override
+    public boolean isAvailable(@NotNull HttpServletRequest request) {
+        boolean available = false;
+
+        SBuild build = getBuild(request);
+        if (build != null) {
+            BuildArtifacts artifacts = build.getArtifacts(BuildArtifactsViewMode.VIEW_ALL);
+            BuildArtifact artifact = artifacts.getArtifact(TAB_BASEPATH);
+            available = artifact != null && !artifact.isDirectory();
+        }
+
+        return available;
     }
 }
