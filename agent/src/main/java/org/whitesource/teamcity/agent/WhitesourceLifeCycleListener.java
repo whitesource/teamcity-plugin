@@ -23,6 +23,7 @@ import jetbrains.buildServer.util.ArchiveUtil;
 import jetbrains.buildServer.util.EventDispatcher;
 import jetbrains.buildServer.util.FileUtil;
 import jetbrains.buildServer.util.StringUtil;
+import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
@@ -119,7 +120,8 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
         // should we check policies first ?
         boolean shouldCheckPolicies = false;
         String overrideCheckPolicies = runner.getRunnerParameters().get(Constants.RUNNER_OVERRIDE_CHECK_POLICIES);
-        if ("global".equals(overrideCheckPolicies)) {
+        if (StringUtils.isBlank(overrideCheckPolicies) ||
+                "global".equals(overrideCheckPolicies)) {
             shouldCheckPolicies = Boolean.parseBoolean(runner.getRunnerParameters().get(Constants.RUNNER_CHECK_POLICIES));
         } else {
             shouldCheckPolicies = "enabled".equals(overrideCheckPolicies);
