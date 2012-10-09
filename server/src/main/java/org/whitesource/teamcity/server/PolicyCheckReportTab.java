@@ -22,6 +22,7 @@ import jetbrains.buildServer.serverSide.artifacts.BuildArtifacts;
 import jetbrains.buildServer.serverSide.artifacts.BuildArtifactsViewMode;
 import jetbrains.buildServer.web.openapi.PagePlaces;
 import jetbrains.buildServer.web.openapi.ViewLogTab;
+import jetbrains.buildServer.web.reportTabs.ReportTabUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,8 +40,7 @@ public class PolicyCheckReportTab extends ViewLogTab {
 
     private static final String TAB_TITLE = "White Source";
     private static final String TAB_CODE = "whitesourceReportTab";
-    private static final String TAB_BASEPATH = "whitesource.zip";
-    private static final String TAB_STARTPAGE = "index.html";
+    private static final String TAB_STARTPAGE = "whitesource.zip!index.html";
 
     /* --- Constructors --- */
 
@@ -59,23 +59,13 @@ public class PolicyCheckReportTab extends ViewLogTab {
 
     @Override
     protected void fillModel(Map model, HttpServletRequest request, @Nullable SBuild build) {
-        model.put("basePath", TAB_BASEPATH);
-        model.put("startPage", TAB_STARTPAGE);
+        model.put("startPage", ReportTabUtil.prepareStartPageForWeb(TAB_STARTPAGE));
     }
 
     /* --- Overridden methods --- */
 
     @Override
-    public boolean isAvailable(@NotNull HttpServletRequest request) {
-        boolean available = false;
-
-        SBuild build = getBuild(request);
-        if (build != null) {
-            BuildArtifacts artifacts = build.getArtifacts(BuildArtifactsViewMode.VIEW_ALL);
-            BuildArtifact artifact = artifacts.getArtifact(TAB_BASEPATH);
-            available = artifact != null && !artifact.isDirectory();
-        }
-
-        return available;
+    protected boolean isAvailable(@NotNull HttpServletRequest request, @NotNull SBuild build) {
+        return super.isAvailable(request, build) && ReportTabUtil.isAvailable(build, TAB_STARTPAGE);
     }
 }
