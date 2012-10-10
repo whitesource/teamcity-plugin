@@ -19,32 +19,26 @@ import com.intellij.openapi.diagnostic.Logger;
 import jetbrains.buildServer.ExtensionHolder;
 import jetbrains.buildServer.agent.*;
 import jetbrains.buildServer.log.Loggers;
-import jetbrains.buildServer.util.ArchiveUtil;
 import jetbrains.buildServer.util.EventDispatcher;
-import jetbrains.buildServer.util.FileUtil;
 import jetbrains.buildServer.util.StringUtil;
 import org.apache.commons.lang.StringUtils;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
-import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.util.CollectionUtils;
 import org.whitesource.agent.api.dispatch.CheckPoliciesResult;
 import org.whitesource.agent.api.dispatch.UpdateInventoryResult;
 import org.whitesource.agent.api.model.AgentProjectInfo;
 import org.whitesource.agent.api.model.DependencyInfo;
+import org.whitesource.agent.report.PolicyCheckReport;
 import org.whitesource.api.client.WhitesourceService;
 import org.whitesource.api.client.WssServiceException;
 import org.whitesource.teamcity.common.Constants;
 import org.whitesource.teamcity.common.WssUtils;
 
-import java.io.*;
-import java.text.SimpleDateFormat;
+import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.zip.ZipOutputStream;
 
 /**
  * @author Edo.Shor
@@ -172,34 +166,10 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
 
     private void policyCheckReport(BuildRunnerContext runner, CheckPoliciesResult result) throws IOException {
         AgentRunningBuild build = runner.getBuild();
-        File reportDir = new File(build.getBuildTempDirectory(), "whitesource");
-        reportDir.mkdirs();
 
-        // generate report
-        Velocity.setProperty(Velocity.RESOURCE_LOADER, "classpath");
-        Velocity.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
-        Velocity.init();
+        PolicyCheckReport report = new PolicyCheckReport(result, build.getProjectName(), build.getBuildNumber());
+        File reportArchive = report.generate(build.getBuildTempDirectory(), true);
 
-        VelocityContext context = new VelocityContext();
-        context.put("buildName", build.getProjectName());
-        context.put("buildNumber", build.getBuildNumber());
-        context.put("creationTime", SimpleDateFormat.getInstance().format(new Date()));
-        context.put("result", result);
-        context.put("hasRejections", result.hasRejections());
-
-        FileWriter fw = new FileWriter(new File(reportDir, "index.html"));
-        Velocity.mergeTemplate("templates/policy-check.vm", "UTF-8", context, fw);
-        fw.flush();
-        fw.close();
-
-        // copy report resources
-        File resource = new File(reportDir, "wss.css");
-        FileUtil.copyResourceIfNotExists(getClass(), "/templates/wss.css", resource);
-
-        // pack report and send to server
-        File reportArchive = new File(build.getBuildTempDirectory(), "whitesource.zip");
-        ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(reportArchive));
-        ArchiveUtil.packZip(reportDir, zos);
         ArtifactsPublisher publisher = extensionHolder.getExtensions(ArtifactsPublisher.class).iterator().next();
         Map<File, String> artifactsToPublish = new HashMap<File, String>();
         artifactsToPublish.put(reportArchive, "");
