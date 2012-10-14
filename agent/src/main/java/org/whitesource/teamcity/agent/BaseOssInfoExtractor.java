@@ -16,12 +16,10 @@
 package org.whitesource.teamcity.agent;
 
 import jetbrains.buildServer.agent.BuildRunnerContext;
-import jetbrains.buildServer.util.StringUtil;
 import org.whitesource.agent.api.model.AgentProjectInfo;
 import org.whitesource.teamcity.common.Constants;
 import org.whitesource.teamcity.common.WssUtils;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 

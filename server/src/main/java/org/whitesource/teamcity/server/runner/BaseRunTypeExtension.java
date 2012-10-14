@@ -23,7 +23,6 @@ import jetbrains.buildServer.web.openapi.WebControllerManager;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.web.servlet.ModelAndView;
 import org.whitesource.teamcity.common.Constants;
-import org.whitesource.teamcity.server.GlobalSettingsManager;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -44,7 +43,6 @@ public abstract class BaseRunTypeExtension extends RunTypeExtension {
 
     protected final PluginDescriptor pluginDescriptor;
     protected final WebControllerManager webControllerManager;
-    protected final GlobalSettingsManager settingsManager;
     protected final Map<String, String> defaultRunnerParams;
 
     /* --- Constructors --- */
@@ -56,11 +54,9 @@ public abstract class BaseRunTypeExtension extends RunTypeExtension {
      * @param pluginDescriptor
      */
     public BaseRunTypeExtension(@NotNull final WebControllerManager webControllerManager,
-                                @NotNull final PluginDescriptor pluginDescriptor,
-                                @NotNull final GlobalSettingsManager settingsManager) {
+                                @NotNull final PluginDescriptor pluginDescriptor) {
         this.webControllerManager = webControllerManager;
         this.pluginDescriptor = pluginDescriptor;
-        this.settingsManager = settingsManager;
 
         defaultRunnerParams = new HashMap<String, String>();
         defaultRunnerParams.put(Constants.RUNNER_IGNORE_POM_MODULES, "true");

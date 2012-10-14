@@ -19,7 +19,6 @@ import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import org.jetbrains.annotations.NotNull;
 import org.whitesource.teamcity.common.Constants;
-import org.whitesource.teamcity.server.GlobalSettingsManager;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -33,7 +32,7 @@ public class GenericRunTypeExtension extends BaseRunTypeExtension {
 
     /* --- Static members --- */
 
-    private static final Collection<String> supportedRunType = Arrays.asList(
+    private static final Collection<String> SUPPORTED_RUN_TYPES = Arrays.asList(
             Constants.RUNNER_ANT,
             Constants.RUNNER_CMD,
             Constants.RUNNER_MSBUILD,
@@ -46,12 +45,10 @@ public class GenericRunTypeExtension extends BaseRunTypeExtension {
      *
      * @param pluginDescriptor
      * @param webControllerManager
-     * @param settingsManager
      */
     public GenericRunTypeExtension(@NotNull final PluginDescriptor pluginDescriptor,
-                                 @NotNull final WebControllerManager webControllerManager,
-                                 @NotNull final GlobalSettingsManager settingsManager) {
-        super(webControllerManager, pluginDescriptor, settingsManager);
+                                 @NotNull final WebControllerManager webControllerManager) {
+        super(webControllerManager, pluginDescriptor);
 
         registerView("viewGenericRunner.html", "runner/viewGenericRunner.jsp");
         registerEdit("editGenericRunner.html", "runner/editGenericRunner.jsp");
@@ -61,7 +58,7 @@ public class GenericRunTypeExtension extends BaseRunTypeExtension {
 
     @Override
     public Collection<String> getRunTypes() {
-        return supportedRunType;
+        return SUPPORTED_RUN_TYPES;
     }
 
 }

@@ -19,7 +19,6 @@ import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import org.jetbrains.annotations.NotNull;
 import org.whitesource.teamcity.common.Constants;
-import org.whitesource.teamcity.server.GlobalSettingsManager;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -33,7 +32,7 @@ public class MavenRunTypeExtension extends BaseRunTypeExtension {
 
     /* --- Static members --- */
 
-    private static final Collection<String> supportedRunType = Arrays.asList(Constants.RUNNER_MAVEN);
+    private static final Collection<String> SUPPORTED_RUN_TYPES = Arrays.asList(Constants.RUNNER_MAVEN);
 
     /* --- Constructors --- */
 
@@ -42,12 +41,10 @@ public class MavenRunTypeExtension extends BaseRunTypeExtension {
      *
      * @param pluginDescriptor
      * @param webControllerManager
-     * @param settingsManager
      */
     public MavenRunTypeExtension(@NotNull final PluginDescriptor pluginDescriptor,
-                                 @NotNull final WebControllerManager webControllerManager,
-                                 @NotNull final GlobalSettingsManager settingsManager) {
-        super(webControllerManager, pluginDescriptor, settingsManager);
+                                 @NotNull final WebControllerManager webControllerManager) {
+        super(webControllerManager, pluginDescriptor);
 
         registerView("viewMavenRunner.html", "runner/viewMavenRunner.jsp");
         registerEdit("editMavenRunner.html", "runner/editMavenRunner.jsp");
@@ -57,7 +54,7 @@ public class MavenRunTypeExtension extends BaseRunTypeExtension {
 
     @Override
     public Collection<String> getRunTypes() {
-        return supportedRunType;
+        return SUPPORTED_RUN_TYPES;
     }
 
 }

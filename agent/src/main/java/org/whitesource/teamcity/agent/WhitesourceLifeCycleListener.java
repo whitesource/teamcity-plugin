@@ -100,9 +100,10 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
         buildLogger.message("Updating White Source");
 
         // make sure we have an organization token
-        String orgToken = runner.getRunnerParameters().get(Constants.RUNNER_OVERRIDE_ORGANIZATION_TOKEN);
+        Map<String, String> runnerParameters = runner.getRunnerParameters();
+        String orgToken = runnerParameters.get(Constants.RUNNER_OVERRIDE_ORGANIZATION_TOKEN);
         if (StringUtil.isEmptyOrSpaces(orgToken)) {
-            orgToken = runner.getRunnerParameters().get(Constants.RUNNER_ORGANIZATION_TOKEN);
+            orgToken = runnerParameters.get(Constants.RUNNER_ORGANIZATION_TOKEN);
         }
         if (StringUtil.isEmptyOrSpaces(orgToken)) {
             stopBuildOnError((AgentRunningBuildEx) build,
@@ -113,10 +114,10 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
 
         // should we check policies first ?
         boolean shouldCheckPolicies = false;
-        String overrideCheckPolicies = runner.getRunnerParameters().get(Constants.RUNNER_OVERRIDE_CHECK_POLICIES);
+        String overrideCheckPolicies = runnerParameters.get(Constants.RUNNER_OVERRIDE_CHECK_POLICIES);
         if (StringUtils.isBlank(overrideCheckPolicies) ||
                 "global".equals(overrideCheckPolicies)) {
-            shouldCheckPolicies = Boolean.parseBoolean(runner.getRunnerParameters().get(Constants.RUNNER_CHECK_POLICIES));
+            shouldCheckPolicies = Boolean.parseBoolean(runnerParameters.get(Constants.RUNNER_CHECK_POLICIES));
         } else {
             shouldCheckPolicies = "enabled".equals(overrideCheckPolicies);
         }
@@ -167,20 +168,20 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
     private void policyCheckReport(BuildRunnerContext runner, CheckPoliciesResult result) throws IOException {
         AgentRunningBuild build = runner.getBuild();
 
-        PolicyCheckReport report = new PolicyCheckReport(result, build.getProjectName(), build.getBuildNumber());
-        File reportArchive = report.generate(build.getBuildTempDirectory(), true);
+       PolicyCheckReport report = new PolicyCheckReport(result, build.getProjectName(), build.getBuildNumber());
+       File reportArchive = report.generate(build.getBuildTempDirectory(), true);
 
-        ArtifactsPublisher publisher = extensionHolder.getExtensions(ArtifactsPublisher.class).iterator().next();
-        Map<File, String> artifactsToPublish = new HashMap<File, String>();
-        artifactsToPublish.put(reportArchive, "");
-        publisher.publishFiles(artifactsToPublish);
+       ArtifactsPublisher publisher = extensionHolder.getExtensions(ArtifactsPublisher.class).iterator().next();
+       Map<File, String> artifactsToPublish = new HashMap<File, String>();
+       artifactsToPublish.put(reportArchive, "");
+       publisher.publishFiles(artifactsToPublish);
     }
 
     /* --- Private methods --- */
 
     private boolean shouldUpdate(BuildRunnerContext runner) {
         String shouldUpdate = runner.getRunnerParameters().get(Constants.RUNNER_DO_UPDATE);
-        return !StringUtil.isEmptyOrSpaces(shouldUpdate) && Boolean.valueOf(shouldUpdate);
+        return !StringUtil.isEmptyOrSpaces(shouldUpdate) && Boolean.parseBoolean(shouldUpdate);
     }
 
     private WhitesourceService createServiceClient(BuildRunnerContext runner) {
@@ -246,8 +247,10 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
         for (AgentProjectInfo projectInfo : projectInfos) {
             log.info("Project coordiantes: " + projectInfo.getCoordinates());
             log.info("Project parent coordiantes: " + projectInfo.getParentCoordinates());
-            log.info("total # of dependencies: " + projectInfo.getDependencies().size());
-            for (DependencyInfo info :  projectInfo.getDependencies()) {
+
+            Collection<DependencyInfo> dependencies = projectInfo.getDependencies();
+            log.info("total # of dependencies: " + dependencies.size());
+            for (DependencyInfo info : dependencies) {
                 log.info(info + " SHA-1: " + info.getSha1());
             }
         }
