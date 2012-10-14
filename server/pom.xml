@@ -11,6 +11,7 @@
     </parent>
 
     <artifactId>server</artifactId>
+    <name>Server</name>
 
     <dependencies>
 

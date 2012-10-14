@@ -12,6 +12,7 @@
 
     <artifactId>assembly</artifactId>
     <packaging>pom</packaging>
+    <name>Assembly</name>
 
     <dependencies>
         <dependency>

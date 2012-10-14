@@ -11,6 +11,7 @@
     </parent>
 
     <artifactId>agent</artifactId>
+    <name>Agent</name>
 
     <properties>
         <agents.version>1.2.0-SNAPSHOT</agents.version>
