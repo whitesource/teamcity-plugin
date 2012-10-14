@@ -17,9 +17,6 @@ package org.whitesource.teamcity.server;
 
 import jetbrains.buildServer.serverSide.SBuild;
 import jetbrains.buildServer.serverSide.SBuildServer;
-import jetbrains.buildServer.serverSide.artifacts.BuildArtifact;
-import jetbrains.buildServer.serverSide.artifacts.BuildArtifacts;
-import jetbrains.buildServer.serverSide.artifacts.BuildArtifactsViewMode;
 import jetbrains.buildServer.web.openapi.PagePlaces;
 import jetbrains.buildServer.web.openapi.ViewLogTab;
 import jetbrains.buildServer.web.reportTabs.ReportTabUtil;

@@ -9,7 +9,7 @@
     <version>1.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>White Source plugin for JetBrains TeamCity</name>
+    <name>White Source TeamCity plugin</name>
     <description>White Source external update agent for the TeamCity CI tool</description>
     <url>https://github.com/whitesource/teamcity-plugin</url>
     <inceptionYear>2012</inceptionYear>

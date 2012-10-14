@@ -105,7 +105,7 @@ public class MavenOssInfoExtractor extends BaseOssInfoExtractor {
             if (projects != null) {
                 List<Element> projectList = projects.getChildren("project");
                 for (Element projectElement : projectList) {
-                    if (!shouldProcess(runner, projectElement)) {
+                    if (!shouldProcess(projectElement)) {
                         continue;
                     }
 
@@ -204,13 +204,13 @@ public class MavenOssInfoExtractor extends BaseOssInfoExtractor {
         return dependencyElement.getChild("dependencyTrail").getChildren("id").size() == 2;
     }
 
-    private boolean shouldProcess(BuildRunnerContext runner, Element project) {
+    private boolean shouldProcess(Element project) {
         boolean process = true;
 
         String artifactId = project.getChildText("artifactId");
         String packaging = project.getChildText("packaging");
 
-        if (ignorePomModules && packaging.equals("pom")) {
+        if (ignorePomModules && "pom".equals(packaging)) {
             process = false;
         } else if (!excludes.isEmpty() && matchAny(artifactId, excludes)) {
             process = false;
