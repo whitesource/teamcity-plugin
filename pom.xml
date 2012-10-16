@@ -414,6 +414,7 @@
                         <version>0.7</version>
                         <configuration>
                             <server>github</server>
+                            <merge>true</merge>
                             <force>true</force>
                             <message>Building site for ${project.artifactId} - ${project.version}</message>
                             <excludes>
