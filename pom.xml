@@ -238,8 +238,8 @@
                         </plugin>
                         <plugin>
                             <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-plugin-plugin</artifactId>
-                            <version>3.1</version>
+                            <artifactId>maven-jxr-plugin</artifactId>
+                            <version>2.3</version>
                         </plugin>
                         <plugin>
                             <groupId>org.apache.maven.plugins</groupId>
@@ -282,11 +282,6 @@
                         </plugin>
                         <plugin>
                             <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-jxr-plugin</artifactId>
-                            <version>2.3</version>
-                        </plugin>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-pmd-plugin</artifactId>
                             <version>2.7.1</version>
                             <configuration>
@@ -316,7 +311,6 @@
                     <artifactId>maven-release-plugin</artifactId>
                     <version>2.3.2</version>
                     <configuration>
-                        <arguments>-Dgpg.passphrase=${passed.gpg.passphrase} -Dgpg.homedir=${passed.gpg.homedir}</arguments>
                         <releaseProfiles>Release</releaseProfiles>
                     </configuration>
                 </plugin>
@@ -329,6 +323,26 @@
                     <groupId>com.mycila.maven-license-plugin</groupId>
                     <artifactId>maven-license-plugin</artifactId>
                     <version>1.9.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jarsigner-plugin</artifactId>
+                    <version>1.2</version>
+                    <executions>
+                        <execution>
+                            <id>sign</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>sign</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <keystore>${keystore.location}</keystore>
+                        <alias>${keystore.alias}</alias>
+                        <storepass>${keystore.storepass}</storepass>
+                        <keypass>${keystore.keypass}</keypass>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -402,6 +416,9 @@
                             <server>github</server>
                             <force>true</force>
                             <message>Building site for ${project.artifactId} - ${project.version}</message>
+                            <excludes>
+                                <exclude>assembly</exclude>
+                            </excludes>
                         </configuration>
                         <executions>
                             <execution>
@@ -416,7 +433,21 @@
                 </plugins>
             </build>
         </profile>
-
     </profiles>
+
+    <distributionManagement>
+        <repository>
+            <id>sonatype-nexus-staging</id>
+            <name>Sonatype staging repository</name>
+            <uniqueVersion>false</uniqueVersion>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+        </repository>
+        <snapshotRepository>
+            <id>sonatype-nexus-snapshots</id>
+            <name>Sonatype snapshots repository</name>
+            <uniqueVersion>false</uniqueVersion>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 
 </project>
