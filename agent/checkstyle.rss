@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<rss version="0.91">
+  <channel>
+    <title>Agent - Checkstyle report</title>
+    <link>https://github.com/whitesource/teamcity-plugin/agent</link>
+    <description>Agent - Checkstyle report</description>
+    <language>en-us</language>
+    <copyright>&#169;2012 White Source</copyright>
+    <item>
+      <title>File: 4,
+             Errors: 183,
+             Warnings: 0,
+             Infos: 0
+      </title>
+            <link>https://github.com/whitesource/teamcity-plugin/agent/checkstyle.html</link>
+      <description>
+        <p>Click <a href="https://github.com/whitesource/teamcity-plugin/agent/checkstyle.html">here</a> for the full Checkstyle report.</p>
+
+        <table summary="Files" boder="1">
+          <thead>
+            <tr>
+              <th>Files</th>
+              <th style="width:30px;"><abbr title="Info">I</abbr></th>
+              <th style="width:30px;"><abbr title="Warning">W</abbr></th>
+              <th style="width:30px;"><abbr title="Error">E</abbr></th>
+            </tr>
+          </thead>
+          <tbody>
+                          <tr>
+                <td>
+                  <a href="https://github.com/whitesource/teamcity-plugin/agent/checkstyle.html#org.whitesource.teamcity.agent.BaseOssInfoExtractor.java">org/whitesource/teamcity/agent/BaseOssInfoExtractor.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  16
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/whitesource/teamcity-plugin/agent/checkstyle.html#org.whitesource.teamcity.agent.WhitesourceLifeCycleListener.java">org/whitesource/teamcity/agent/WhitesourceLifeCycleListener.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  79
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/whitesource/teamcity-plugin/agent/checkstyle.html#org.whitesource.teamcity.agent.MavenOssInfoExtractor.java">org/whitesource/teamcity/agent/MavenOssInfoExtractor.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  57
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/whitesource/teamcity-plugin/agent/checkstyle.html#org.whitesource.teamcity.agent.GenericOssInfoExtractor.java">org/whitesource/teamcity/agent/GenericOssInfoExtractor.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  31
+                </td>
+              </tr>
+                      </tbody>
+        </table>
+        
+      </description>
+    </item>
+  </channel>
+</rss>
+
