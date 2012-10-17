@@ -1,0 +1,4 @@
+org.whitesource.teamcity.agent
+org.whitesource.teamcity.common
+org.whitesource.teamcity.server
+org.whitesource.teamcity.server.runner
