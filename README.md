@@ -13,6 +13,7 @@ Once set up, all usage of open source software in the organization will be conti
 * Policies will be enforced on every action, failing the build if necessary.
 
 Check the [online documentation][3] for instructions and screencasts on how to use the plugin.
+Technical information about the plugin could be found [here][6].
 
 ### Support
 You can always create an issue or tell our support team what you think [here][4].
@@ -38,6 +39,6 @@ limitations under the License.
 [1]: http://www.github.com/whitesource/agents
 [2]: http:/http://www.jetbrains.com/teamcity/
 [3]: http://docs.whitesourcesoftware.com/display/serviceDocs/TeamCity+Integration
-[5]: http://whitesource.github.com/maven-plugin
 [4]: mailto:support@whitesourcesoftware.com
 [5]: http://www.apache.org/licenses/LICENSE-2.0.html
+[6]: http://whitesource.github.com/teamcity-plugin
