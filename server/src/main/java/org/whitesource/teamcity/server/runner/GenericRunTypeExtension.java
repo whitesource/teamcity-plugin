@@ -35,8 +35,11 @@ public class GenericRunTypeExtension extends BaseRunTypeExtension {
     private static final Collection<String> SUPPORTED_RUN_TYPES = Arrays.asList(
             Constants.RUNNER_ANT,
             Constants.RUNNER_CMD,
+            Constants.RUNNER_POWERSHELL,
             Constants.RUNNER_MSBUILD,
-            Constants.RUNNER_POWERSHELL);
+            Constants.RUNNER_VS_SOLUTION,
+            Constants.RUNNER_VS_SLN2003,
+            Constants.RUNNER_IDEA);
 
     /* --- Constructors --- */
 

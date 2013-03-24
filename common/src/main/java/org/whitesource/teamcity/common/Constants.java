@@ -47,12 +47,17 @@ public final class Constants {
 
 
     /* --- Runner types --- */
+
+    /**
+     * These constants are taken from build agent console log on start up
+     */
     public static final String RUNNER_MAVEN = "Maven2";
     public static final String RUNNER_ANT = "Ant";
     public static final String RUNNER_CMD = "simpleRunner";
     public static final String RUNNER_MSBUILD = "MSBuild";
     public static final String RUNNER_POWERSHELL = "jetbrains_powershell";
     public static final String RUNNER_IDEA = "JPS";
-    public static final String RUNNER_GRADLE = "gradle-runner";
+    public static final String RUNNER_VS_SOLUTION = "VS.Solution";
+    public static final String RUNNER_VS_SLN2003 = "sln2003";
 
 }
