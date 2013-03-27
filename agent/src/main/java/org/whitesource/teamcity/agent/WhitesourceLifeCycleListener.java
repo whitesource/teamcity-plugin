@@ -88,13 +88,9 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
         super.runnerFinished(runner, status);
 
         AgentRunningBuild build = runner.getBuild();
+        Loggers.AGENT.info(WssUtils.logMsg(LOG_COMPONENT, "runner finished " + build.getProjectName() + " type " + runner.getName()));
 
-        Loggers.AGENT.info(WssUtils.logMsg(LOG_COMPONENT, "runner finished "
-                + build.getProjectName() + " type " + runner.getName()));
-
-        if (!shouldUpdate(runner)) {
-            return; // no need to update white source...
-        }
+        if (!shouldUpdate(runner)) return; // no need to update white source...
 
         final BuildProgressLogger buildLogger = build.getBuildLogger();
         buildLogger.message("Updating White Source");
@@ -107,8 +103,7 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
         }
         if (StringUtil.isEmptyOrSpaces(orgToken)) {
             stopBuildOnError((AgentRunningBuildEx) build,
-                    new IllegalStateException("Empty organization token. " +
-                            "Please make sure an organization token is defined for this runner"));
+                    new IllegalStateException("Empty organization token. Please make sure an organization token is defined for this runner"));
             return;
         }
 
@@ -185,14 +180,15 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
     }
 
     private WhitesourceService createServiceClient(BuildRunnerContext runner) {
-        String serviceUrl = runner.getRunnerParameters().get(Constants.RUNNER_SERVICE_URL);
+        Map<String, String> runnerParameters = runner.getRunnerParameters();
+        String serviceUrl = runnerParameters.get(Constants.RUNNER_SERVICE_URL);
         WhitesourceService service = new WhitesourceService(Constants.AGENT_TYPE, Constants.AGENT_VERSION, serviceUrl);
 
-        String proxyHost = runner.getRunnerParameters().get(Constants.RUNNER_PROXY_HOST);
+        String proxyHost = runnerParameters.get(Constants.RUNNER_PROXY_HOST);
         if (!StringUtil.isEmptyOrSpaces(proxyHost)) {
-            int port = Integer.parseInt(runner.getRunnerParameters().get(Constants.RUNNER_PROXY_PORT));
-            String username = runner.getRunnerParameters().get(Constants.RUNNER_PROXY_USERNAME);
-            String password = runner.getRunnerParameters().get(Constants.RUNNER_PROXY_PASSWORD);
+            int port = Integer.parseInt(runnerParameters.get(Constants.RUNNER_PROXY_PORT));
+            String username = runnerParameters.get(Constants.RUNNER_PROXY_USERNAME);
+            String password = runnerParameters.get(Constants.RUNNER_PROXY_PASSWORD);
             service.getClient().setProxy(proxyHost, port, username, password);
         }
 

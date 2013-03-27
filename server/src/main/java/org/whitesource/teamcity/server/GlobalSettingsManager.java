@@ -37,7 +37,7 @@ public class GlobalSettingsManager {
 
     private static final String LOG_COMPONENT = "GlobalConfig";
 
-    private final static String CONFIG_FILE_NAME = "whitesource-config.xml";
+    private static final String CONFIG_FILE_NAME = "whitesource-config.xml";
 
     /* --- Members --- */
 

@@ -16,6 +16,7 @@
 package org.whitesource.teamcity.agent;
 
 import jetbrains.buildServer.agent.AgentRunningBuild;
+import jetbrains.buildServer.agent.BuildProgressLogger;
 import jetbrains.buildServer.agent.BuildRunnerContext;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.util.FileUtil;
@@ -30,6 +31,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -89,17 +91,18 @@ public class GenericOssInfoExtractor extends BaseOssInfoExtractor {
         projectInfo.setCoordinates(new Coordinates(null, build.getProjectName(), null));
         projectInfo.setProjectToken(projectToken);
 
+        BuildProgressLogger buildLogger = build.getBuildLogger();
         if (includePatterns.isEmpty()) {
             Loggers.AGENT.warn(WssUtils.logMsg(LOG_COMPONENT, "No include patterns defined. Skipping."));
-            build.getBuildLogger().warning("No include patterns defined. Can't look for open source information.");
+            buildLogger.warning("No include patterns defined. Can't look for open source information.");
         } else {
-            build.getBuildLogger().message("Including files matching:");
-            build.getBuildLogger().message(StringUtil.join(includes,"\n"));
+            buildLogger.message("Including files matching:");
+            buildLogger.message(StringUtil.join(includes, "\n"));
             if (excludes.isEmpty()) {
-                build.getBuildLogger().message("Excluding none.");
+                buildLogger.message("Excluding none.");
             } else {
-                build.getBuildLogger().message("Excluding files matching:");
-                build.getBuildLogger().message(StringUtil.join(excludes,"\n"));
+                buildLogger.message("Excluding files matching:");
+                buildLogger.message(StringUtil.join(excludes, "\n"));
             }
 
             extractOssInfo(build.getCheckoutDirectory(), projectInfo.getDependencies());
@@ -141,11 +144,9 @@ public class GenericOssInfoExtractor extends BaseOssInfoExtractor {
     private boolean matchAny(String value, List<Pattern> patterns) {
         boolean match = false;
 
-        for (Pattern pattern : patterns) {
-            if (pattern.matcher(value).matches()) {
-                match = true;
-                break;
-            }
+        Iterator<Pattern> it = patterns.iterator();
+        while (it.hasNext() && !match) {
+            match = it.next().matcher(value).matches();
         }
 
         return match;

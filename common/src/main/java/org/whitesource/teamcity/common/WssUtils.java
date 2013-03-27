@@ -76,4 +76,10 @@ public final class WssUtils {
         return params;
     }
 
+    /* --- Private constructor --- */
+
+    private WssUtils() {
+        // hide utility class constructor
+    }
+
 }

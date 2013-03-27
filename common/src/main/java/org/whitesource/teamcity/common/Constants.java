@@ -60,4 +60,10 @@ public final class Constants {
     public static final String RUNNER_VS_SOLUTION = "VS.Solution";
     public static final String RUNNER_VS_SLN2003 = "sln2003";
 
+    /* --- Private constructor --- */
+
+    private Constants() {
+        // hide utility class constructor
+    }
+
 }
