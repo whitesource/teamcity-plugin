@@ -317,6 +317,17 @@
                     <groupId>org.whitesource</groupId>
                     <artifactId>whitesource-maven-plugin</artifactId>
                     <version>1.1.4</version>
+                    <configuration>
+                        <orgToken>${whitesource.orgToken}</orgToken>
+                        <moduleTokens>
+                            <common>2a7370d9-cacc-4e72-9754-3ecb0e167717</common>
+                            <server>b3c5abd6-8cf8-4536-a9c0-4f6a93cb823c</server>
+                            <agent>7d985fb4-9893-4e1c-b727-e13a07d1b83c</agent>
+                        </moduleTokens>
+                        <excludes>
+                            <exclude>assembly</exclude>
+                        </excludes>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>com.mycila.maven-license-plugin</groupId>
@@ -348,31 +359,6 @@
     </build>
 
     <profiles>
-        <profile>
-            <id>ci-build</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.whitesource</groupId>
-                        <artifactId>whitesource-maven-plugin</artifactId>
-                        <configuration>
-                            <orgToken>${whitesource.orgToken}</orgToken>
-                            <moduleTokens>
-                                <common>2a7370d9-cacc-4e72-9754-3ecb0e167717</common>
-                                <server>b3c5abd6-8cf8-4536-a9c0-4f6a93cb823c</server>
-                                <agent>7d985fb4-9893-4e1c-b727-e13a07d1b83c</agent>
-                            </moduleTokens>
-                            <excludes>
-                                <exclude>assembly</exclude>
-                            </excludes>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
         <profile>
             <id>Package</id>
             <build>
