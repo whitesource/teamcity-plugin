@@ -34,7 +34,7 @@ import java.net.URL;
  *
  * @author Edo.Shor
  */
-public class GlobalSettingsController extends BaseFormXmlController {
+public class    GlobalSettingsController extends BaseFormXmlController {
 
     /* --- Members --- */
 

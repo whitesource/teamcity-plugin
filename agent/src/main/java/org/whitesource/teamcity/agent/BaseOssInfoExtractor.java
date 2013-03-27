@@ -22,6 +22,7 @@ import org.whitesource.teamcity.common.WssUtils;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Base class for extractors of open source usage information;
@@ -50,11 +51,10 @@ public abstract class BaseOssInfoExtractor {
     protected BaseOssInfoExtractor(BuildRunnerContext runner) {
         this.runner = runner;
 
-        projectToken = runner.getRunnerParameters().get(Constants.RUNNER_PROJECT_TOKEN);
-        includes = WssUtils.splitParameters(
-                runner.getRunnerParameters().get(Constants.RUNNER_INCLUDES));
-        excludes = WssUtils.splitParameters(
-                runner.getRunnerParameters().get(Constants.RUNNER_EXCLUDES));
+        Map<String,String> runnerParameters = runner.getRunnerParameters();
+        projectToken = runnerParameters.get(Constants.RUNNER_PROJECT_TOKEN);
+        includes = WssUtils.splitParameters(runnerParameters.get(Constants.RUNNER_INCLUDES));
+        excludes = WssUtils.splitParameters(runnerParameters.get(Constants.RUNNER_EXCLUDES));
     }
 
     /* --- Abstract methods --- */

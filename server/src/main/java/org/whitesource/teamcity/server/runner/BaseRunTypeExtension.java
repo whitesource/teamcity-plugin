@@ -82,7 +82,7 @@ public abstract class BaseRunTypeExtension extends RunTypeExtension {
 
     @Override
     public PropertiesProcessor getRunnerPropertiesProcessor() {
-        //TODO: implement once we want validations
+        // OPTIONAL: implement once we want validations
         return null;
     }
 
