@@ -29,10 +29,7 @@ import org.whitesource.teamcity.common.WssUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -46,6 +43,15 @@ public class GenericOssInfoExtractor extends BaseOssInfoExtractor {
     /* --- Static members --- */
 
     private static final String LOG_COMPONENT = "GenericExtractor";
+
+    private static final List<String> DEFAULT_SCAN_EXTENSIONS = new ArrayList<String>();
+    static {
+        DEFAULT_SCAN_EXTENSIONS.addAll(
+                Arrays.asList("jar", "war", "ear", "par", "rar",
+                        "dll", "exe", "ko", "so", "msi",
+                        "zip", "tar", "tar.gz",
+                        "swc", "swf"));
+    }
 
     /* --- Members --- */
 
@@ -66,6 +72,11 @@ public class GenericOssInfoExtractor extends BaseOssInfoExtractor {
         includePatterns = new ArrayList<Pattern>();
         for (String pattern : includes) {
             includePatterns.add(Pattern.compile(FileUtil.convertAntToRegexp(pattern)));
+        }
+        if (includePatterns.isEmpty()) {
+            for (String extension : DEFAULT_SCAN_EXTENSIONS) {
+                includePatterns.add(Pattern.compile(FileUtil.convertAntToRegexp("**/*." + extension)));
+            }
         }
 
         excludePatterns = new ArrayList<Pattern>();
@@ -133,7 +144,7 @@ public class GenericOssInfoExtractor extends BaseOssInfoExtractor {
                 }
 
                 if (process) {
-                    dependencyInfos.add(extractDepependencyInfo(file));
+                    dependencyInfos.add(extractDependencyInfo(file));
                 }
             } else {
                 extractOssInfo(absoluteRoot, file, dependencyInfos);
@@ -152,7 +163,7 @@ public class GenericOssInfoExtractor extends BaseOssInfoExtractor {
         return match;
     }
 
-    private DependencyInfo extractDepependencyInfo(File file) {
+    private DependencyInfo extractDependencyInfo(File file) {
         DependencyInfo info = new DependencyInfo();
 
         info.setSystemPath(file.getAbsolutePath());

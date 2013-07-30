@@ -23,6 +23,8 @@
 <script type="text/javascript">
 
     function toggleSettings() {
+        $('containerProduct').toggle();
+        $('containerProductVersion').toggle();
         $('containerOverrideOrgToken').toggle();
         $('containerOverrideCheckPolicies').toggle();
         $('containerProjectToken').toggle();
@@ -49,6 +51,33 @@
 
     <c:set var="showSettings" value="${not empty propertiesBean.properties['org.whitesource.doUpdate']}"/>
 
+    <tr id="containerProduct" style="${showSettings ? '' : 'display: none;'}">
+        <th>
+            <label for="org.whitesource.product">
+                Product name or token:
+                <bs:helpIcon iconTitle="Tokens can be found in the administration section of your account on White Source."/>
+            </label>
+        </th>
+        <td>
+            <props:textProperty name="org.whitesource.product" size="55"/>
+            <span class="smallNote">
+                Optional. Name or unique identifier of the product to update.
+            </span>
+        </td>
+    </tr>
+    <tr id="containerProductVersion" style="${showSettings ? '' : 'display: none;'}">
+        <th>
+            <label for="org.whitesource.productVersion">
+                Product version:
+            </label>
+        </th>
+        <td>
+            <props:textProperty name="org.whitesource.productVersion" size="55"/>
+            <span class="smallNote">
+                Optional. Version to use for all projects in this product.
+            </span>
+        </td>
+    </tr>
     <tr id="containerOverrideOrgToken" style="${showSettings ? '' : 'display: none;'}">
         <th>
             Override organization token:
@@ -57,7 +86,7 @@
         <td>
             <props:textProperty name="org.whitesource.overrideOrgToken" size="55"/>
             <span class="smallNote">
-                Organization token to use instead of global settings.
+                Optional. Organization token to use instead of global settings.
             </span>
         </td>
     </tr>
@@ -70,7 +99,7 @@
             <props:radioButtonProperty name="org.whitesource.overrideCheckPolicies" value="enable"/> Enable
             <props:radioButtonProperty name="org.whitesource.overrideCheckPolicies" value="disable"/> Disable
             <span class="smallNote">
-                Override check policies in global settings.
+                Optional. Override check policies in global settings.
             </span>
         </td>
     </tr>
@@ -84,7 +113,7 @@
         <td>
             <props:textProperty name="org.whitesource.projectToken" size="55"/>
             <span class="smallNote">
-                Unique identifier of the project to update. If omitted, default naming convention applies.
+                Optional. Unique identifier of the project to update. Leave blank to use default naming convention.
             </span>
         </td>
     </tr>
@@ -130,7 +159,7 @@
             <span class="smallNote">
                 Comma or line separated list of maven modules artifactId patterns to exclude from update.
                 <br/>You can use * to match a set of modules.
-                <br/>For exmaple, type "test-*" to exclude all artifactIds prefixed with "test-".
+                <br/>For example, type "test-*" to exclude all artifactIds prefixed with "test-".
             </span>
         </td>
     </tr>

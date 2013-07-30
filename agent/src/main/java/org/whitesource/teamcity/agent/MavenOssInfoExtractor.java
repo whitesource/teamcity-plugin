@@ -55,6 +55,8 @@ public class MavenOssInfoExtractor extends BaseOssInfoExtractor {
 
     protected boolean ignorePomModules;
 
+    private String topMostProjectName;
+
     /* --- Constructors --- */
 
     /**
@@ -92,9 +94,21 @@ public class MavenOssInfoExtractor extends BaseOssInfoExtractor {
         Element projects = root.getChild("projects");
         if (projects != null) {
             projectInfos = extractProjects(projects, hierarchy);
+
+            Element topMostProject = extractTopProject(root);
+            if (topMostProject != null) {
+                topMostProjectName = topMostProject.getChildText("name");
+                if (topMostProjectName == null) {
+                    topMostProjectName = topMostProject.getChildText("artifactId");
+                }
+            }
         }
 
         return projectInfos;
+    }
+
+    public String getTopMostProjectName() {
+        return topMostProjectName;
     }
 
     /* --- Private methods --- */
@@ -241,6 +255,34 @@ public class MavenOssInfoExtractor extends BaseOssInfoExtractor {
         // check the dependency trail to see only two dependents.
         // Expecting actual module and self for direct dependencies.
         return dependencyElement.getChild("dependencyTrail").getChildren("id").size() == 2;
+    }
+
+    private Element extractTopProject(Element root) {
+        Element hierarchy = root.getChild("hierarchy");
+        Element projects = root.getChild("projects");
+        if (hierarchy ==  null || projects ==  null) { return null; }
+
+        // get top most project ID
+        String topProjectId = null;
+        List<Element> nodes = hierarchy.getChildren("node");
+        if (!nodes.isEmpty()) {
+            topProjectId = nodes.get(0).getChildText("id");
+        }
+        if (StringUtil.isEmptyOrSpaces(topProjectId)) { return null; }
+
+        // get top most project element
+        Element topMostProject = null;
+        List<Element> projectList = projects.getChildren("project");
+        Iterator<Element> iterator = projectList.iterator();
+        while (iterator.hasNext() && topMostProject == null) {
+            Element projectElement = iterator.next();
+            if (topProjectId.equals(projectElement.getChildText("id"))) {
+                topMostProject = projectElement;
+
+            }
+        }
+
+        return topMostProject;
     }
 
 }

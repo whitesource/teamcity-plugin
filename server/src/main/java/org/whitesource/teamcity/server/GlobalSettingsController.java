@@ -34,7 +34,7 @@ import java.net.URL;
  *
  * @author Edo.Shor
  */
-public class    GlobalSettingsController extends BaseFormXmlController {
+public class GlobalSettingsController extends BaseFormXmlController {
 
     /* --- Members --- */
 
@@ -44,8 +44,6 @@ public class    GlobalSettingsController extends BaseFormXmlController {
 
     /**
      * Constructor
-     *
-     * @param settingsManager
      */
     public GlobalSettingsController(GlobalSettingsManager settingsManager) {
         this.settingsManager = settingsManager;
@@ -75,6 +73,7 @@ public class    GlobalSettingsController extends BaseFormXmlController {
         final GlobalSettings settings = new GlobalSettings();
         settings.setOrgToken(request.getParameter("orgToken"));
         settings.setCheckPolicies(Boolean.parseBoolean(request.getParameter("checkPolicies")));
+        settings.setServiceUrl(request.getParameter("serviceUrl"));
 
         String proxyHost = request.getParameter("proxyHost");
         if (!StringUtil.isEmptyOrSpaces(proxyHost)){
@@ -109,11 +108,15 @@ public class    GlobalSettingsController extends BaseFormXmlController {
             errors.addError("invalidOrgToken", "Organization token can not be empty.");
         }
 
+        final String serviceUrl = request.getParameter("serviceUrl");
+        if (!StringUtil.isEmptyOrSpaces(serviceUrl) && !isValidUrl(serviceUrl)) {
+            errors.addError("invalidServiceUrl", "Service Url is not a valid URL");
+        }
+
         String host = request.getParameter("proxyHost");
         if (!StringUtil.isEmptyOrSpaces(host)) {
-            try {
-                new URL(host);
-            } catch (MalformedURLException e) {
+
+            if (!isValidUrl(host)) {
                 errors.addError("invalidProxyHost", "Host must be a valid url.");
             }
 
@@ -137,5 +140,14 @@ public class    GlobalSettingsController extends BaseFormXmlController {
         }
 
         return errors;
+    }
+
+    private boolean isValidUrl(String url) {
+        try {
+            new URL(url);
+            return true;
+        } catch (MalformedURLException e) {
+            return false;
+        }
     }
 }
