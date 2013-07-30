@@ -130,7 +130,7 @@ public class MavenOssInfoExtractor extends BaseOssInfoExtractor {
     }
 
     private void processHierarchy(Element root, Map<String, Coordinates> hierarchy) {
-        if (root == null) return;
+        if (root == null) { return; }
 
         List<Element> nodes = root.getChildren("node");
         for(Element node : nodes) {
@@ -222,7 +222,7 @@ public class MavenOssInfoExtractor extends BaseOssInfoExtractor {
 
     private void extractDependencies(Element projectElement, AgentProjectInfo projectInfo) {
         Element dependencyArtifacts = projectElement.getChild("dependencyArtifacts");
-        if (dependencyArtifacts == null)  return;
+        if (dependencyArtifacts == null) { return; }
 
         List<Element> dependencyList = dependencyArtifacts.getChildren("artifact");
         for (Element dependencyElement : dependencyList) {

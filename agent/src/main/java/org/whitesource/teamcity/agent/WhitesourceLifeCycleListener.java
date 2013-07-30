@@ -87,7 +87,7 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
         AgentRunningBuild build = runner.getBuild();
         Loggers.AGENT.info(WssUtils.logMsg(LOG_COMPONENT, "runner finished " + build.getProjectName() + " type " + runner.getName()));
 
-        if (!shouldUpdate(runner)) return; // no need to update white source...
+        if (!shouldUpdate(runner)) { return; } // no need to update white source...
 
         final BuildProgressLogger buildLogger = build.getBuildLogger();
         buildLogger.message("Updating White Source");
