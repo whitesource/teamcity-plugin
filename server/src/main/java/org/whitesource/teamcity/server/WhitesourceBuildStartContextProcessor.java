@@ -15,6 +15,7 @@
  */
 package org.whitesource.teamcity.server;
 
+import com.intellij.openapi.util.text.StringUtil;
 import jetbrains.buildServer.serverSide.BuildStartContext;
 import jetbrains.buildServer.serverSide.BuildStartContextProcessor;
 import jetbrains.buildServer.serverSide.SRunnerContext;
@@ -53,17 +54,16 @@ public class WhitesourceBuildStartContextProcessor implements BuildStartContextP
         }
 
         String orgToken = globalSettings.getOrgToken();
+        String serviceUrl = globalSettings.getServiceUrl();
         boolean checkPolicies = globalSettings.isCheckPolicies();
         ProxySettings proxy = globalSettings.getProxy();
 
         for (SRunnerContext runnerContext : context.getRunnerContexts()) {
-            // system envrionment
-            runnerContext.addRunnerParameter(Constants.RUNNER_SERVICE_URL,
-                    TeamCityProperties.getProperty(Constants.RUNNER_SERVICE_URL));
-
-            // global settings
             runnerContext.addRunnerParameter(Constants.RUNNER_ORGANIZATION_TOKEN, orgToken);
             runnerContext.addRunnerParameter(Constants.RUNNER_CHECK_POLICIES, Boolean.toString(checkPolicies));
+            if (!StringUtil.isEmptyOrSpaces(serviceUrl)) {
+                runnerContext.addRunnerParameter(Constants.RUNNER_SERVICE_URL, serviceUrl);
+            }
 
             if (proxy != null) {
                 runnerContext.addRunnerParameter(Constants.RUNNER_PROXY_HOST, proxy.getHost());

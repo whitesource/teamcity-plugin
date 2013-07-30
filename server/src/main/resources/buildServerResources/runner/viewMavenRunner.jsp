@@ -20,6 +20,8 @@
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
 
 <c:set var="doUpdate" value="${not empty propertiesBean.properties['org.whitesource.doUpdate']}" />
+<c:set var="product" value="${propertiesBean.properties['org.whitesource.product']}" />
+<c:set var="productVersion" value="${propertiesBean.properties['org.whitesource.productVersion']}" />
 <c:set var="overrideOrgToken" value="${propertiesBean.properties['org.whitesource.overrideOrgToken']}" />
 <c:set var="projectToken" value="${propertiesBean.properties['org.whitesource.projectToken']}" />
 <c:set var="moduleTokens" value="${propertiesBean.properties['org.whitesource.moduleTokens']}" />
@@ -33,6 +35,18 @@
         <c:out value="${doUpdate ? 'enabled' : 'disabled'}"/>
     </strong>
 
+    <div class="nestedParameter" style="${doUpdate ? '' : 'display:none;'}">
+        Product name or token:
+        <strong>
+            <c:out value="${product}"/>
+        </strong>
+    </div>
+    <div class="nestedParameter" style="${doUpdate ? '' : 'display:none;'}">
+        Product version:
+        <strong>
+            <c:out value="${productVersion}"/>
+        </strong>
+    </div>
     <div class="nestedParameter" style="${doUpdate ? '' : 'display:none;'}">
         Organization token:
         <strong>

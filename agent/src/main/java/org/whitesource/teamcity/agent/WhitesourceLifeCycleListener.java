@@ -55,9 +55,6 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
 
     /**
      * Constructor
-     *
-     * @param eventDispatcher
-     * @param extensionHolder
      */
     public WhitesourceLifeCycleListener(@NotNull final EventDispatcher<AgentLifeCycleListener> eventDispatcher,
                                         @NotNull final ExtensionHolder extensionHolder) {
@@ -90,7 +87,7 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
         AgentRunningBuild build = runner.getBuild();
         Loggers.AGENT.info(WssUtils.logMsg(LOG_COMPONENT, "runner finished " + build.getProjectName() + " type " + runner.getName()));
 
-        if (!shouldUpdate(runner)) return; // no need to update white source...
+        if (!shouldUpdate(runner)) { return; } // no need to update white source...
 
         final BuildProgressLogger buildLogger = build.getBuildLogger();
         buildLogger.message("Updating White Source");
@@ -108,7 +105,7 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
         }
 
         // should we check policies first ?
-        boolean shouldCheckPolicies = false;
+        boolean shouldCheckPolicies;
         String overrideCheckPolicies = runnerParameters.get(Constants.RUNNER_OVERRIDE_CHECK_POLICIES);
         if (StringUtils.isBlank(overrideCheckPolicies) ||
                 "global".equals(overrideCheckPolicies)) {
@@ -117,15 +114,22 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
             shouldCheckPolicies = "enabled".equals(overrideCheckPolicies);
         }
 
+        String product = runnerParameters.get(Constants.RUNNER_PRODUCT);
+        String productVersion = runnerParameters.get(Constants.RUNNER_PRODUCT_VERSION);
+
         // collect OSS usage information
         buildLogger.message("Collecting OSS usage information");
-        BaseOssInfoExtractor extractor = null;
+        Collection<AgentProjectInfo> projectInfos;
         if (WssUtils.isMavenRunType(runner.getRunType())) {
-            extractor = new MavenOssInfoExtractor(runner);
+            MavenOssInfoExtractor extractor = new MavenOssInfoExtractor(runner);
+            projectInfos = extractor.extract();
+            if (StringUtil.isEmptyOrSpaces(product)) {
+                product = extractor.getTopMostProjectName();
+            }
         } else {
-            extractor = new GenericOssInfoExtractor(runner);
+            GenericOssInfoExtractor extractor = new GenericOssInfoExtractor(runner);
+            projectInfos = extractor.extract();
         }
-        Collection<AgentProjectInfo> projectInfos = extractor.extract();
         debugAgentProjectInfos(projectInfos);
 
         // send to white source
@@ -136,16 +140,16 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
             try{
                 if (shouldCheckPolicies) {
                     buildLogger.message("Checking policies");
-                    CheckPoliciesResult result = service.checkPolicies(orgToken, projectInfos);
+                    CheckPoliciesResult result = service.checkPolicies(orgToken, product, productVersion, projectInfos);
                     policyCheckReport(runner, result);
                     if (result.hasRejections()) {
                         stopBuild((AgentRunningBuildEx) build, "Open source rejected by organization policies.");
                     } else {
                         buildLogger.message("All dependencies conform with open source policies.");
-                        sendUpdate(orgToken, projectInfos, service, buildLogger);
+                        sendUpdate(orgToken, product, productVersion, projectInfos, service, buildLogger);
                     }
                 } else {
-                    sendUpdate(orgToken, projectInfos, service, buildLogger);
+                    sendUpdate(orgToken, product, productVersion, projectInfos, service, buildLogger);
                 }
             } catch (WssServiceException e) {
                 stopBuildOnError((AgentRunningBuildEx) build, e);
@@ -195,12 +199,12 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
         return service;
     }
 
-    private void sendUpdate(String orgToken, Collection<AgentProjectInfo> projectInfos,
+    private void sendUpdate(String orgToken, String product, String productVersion, Collection<AgentProjectInfo> projectInfos,
                             WhitesourceService service, BuildProgressLogger buildLogger)
             throws WssServiceException {
 
         buildLogger.message("Sending to White Source");
-        UpdateInventoryResult updateResult = service.update(orgToken, projectInfos);
+        UpdateInventoryResult updateResult = service.update(orgToken, product, productVersion, projectInfos);
         logUpdateResult(updateResult, buildLogger);
     }
 

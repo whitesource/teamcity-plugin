@@ -40,6 +40,11 @@
                     SettingsForm.highlightErrorField($("orgToken"));
                 },
 
+                onInvalidServiceUrlError: function(elem) {
+                    $("invalidServiceUrl").innerHTML = elem.firstChild.nodeValue;
+                    SettingsForm.highlightErrorField($("serviceUrl"));
+                },
+
                 onInvalidProxyHostError: function(elem) {
                     $("invalidProxyHost").innerHTML = elem.firstChild.nodeValue;
                     SettingsForm.highlightErrorField($("proxyHost"));
@@ -93,7 +98,6 @@
 
         <form id="globalSettingsForm" action="${controllerUrl}" method="post" onsubmit="{return SettingsForm.save()}">
             <table class="runnerFormTable">
-
                 <tr class="groupingTitle">
                     <td colspan="2">Account settings</td>
                 </tr>
@@ -106,13 +110,10 @@
                         </label>
                     </th>
                     <td>
-                        <forms:textField name="orgToken" value="${settingsManager.globalSettings.orgToken}" size="60"/>
+                        <forms:textField name="orgToken" value="${settingsManager.globalSettings.orgToken}" style="width:300px;"/>
                         <span class="error" id="invalidOrgToken"></span>
                         <div class="smallNote" style="margin-left: 0;">Unique identifier of the organization to update.</div>
                     </td>
-                </tr>
-                <tr class="groupingTitle">
-                    <td colspan="2">Check policies</td>
                 </tr>
                 <tr>
                     <th>
@@ -130,60 +131,73 @@
                         </div>
                     </td>
                 </tr>
+                <tr class="groupingTitle">
+                    <td colspan="2">API Endpoint</td>
+                </tr>
+                <tr>
+                    <th>
+                        <label for="serviceUrl">
+                            Service Url
+                        </label>
+                    </th>
+                    <td>
+                        <forms:textField name="serviceUrl" value="${settingsManager.globalSettings.serviceUrl}" style="width:300px;" size="255"/>
+                        <span class="error" id="invalidServiceUrl"></span>
+                        <div class="smallNote" style="margin-left: 0;">
+                            Optional. Url to on premise installation of White Source.
+                            SaaS accounts should leave this field blank.
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        <label for="useProxyCheckbox">
+                            Proxy Server
+                        </label>
+                    </th>
+                    <td>
+                        <forms:checkbox name="useProxyCheckbox" checked="${settingsManager.proxy}" onclick="$('proxySettings').toggle()" />
+                        <div class="smallNote" style="margin-left: 0;">
+                            Optional. Settings for proxy server if required for communication with White Source.
+                        </div>
+                        <div id="proxySettings" style="display: ${settingsManager.proxy ? 'block' : 'none'};">
+                            <table>
+                                <tr>
+                                    <th> <label for="proxyHost">Host</label> </th>
+                                    <td>
+                                        <forms:textField name="proxyHost" value="${settingsManager.globalSettings.proxy.host}"/>
+                                        <span class="error" id="invalidProxyHost"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th> <label for="proxyPort">Port</label> </th>
+                                    <td>
+                                        <c:set var="port" value=""/>
+                                        <c:if test="${settingsManager.globalSettings.proxy.port != -1}">
+                                            <c:set var="port" value="${settingsManager.globalSettings.proxy.port}"/>
+                                        </c:if>
+                                        <forms:textField name="proxyPort" value="${port}" />
+                                        <span class="error" id="invalidProxyPort"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th> <label for="proxyUsername">Username</label> </th>
+                                    <td>
+                                        <forms:textField name="proxyUsername" value="${settingsManager.globalSettings.proxy.username}"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th> <label for="proxyPassword">Password</label> </th>
+                                    <td>
+                                        <forms:passwordField name="proxyPassword"/>
+                                        <span class="error" id="invalidProxyPassword"></span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
             </table>
-            <br/>
-            <div id="useProxy">
-                <table border="0">
-                    <tr>
-                        <td><forms:checkbox name="useProxyCheckbox" checked="${settingsManager.proxy}" onclick="$('proxySettings').toggle()" /></td>
-                        <td>
-                            Use a proxy server
-                            <bs:helpIcon iconTitle="Settings for Proxy server when needed to access white source serive."/>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-            <br/>
-            <div id="proxySettings" style="display: ${settingsManager.proxy ? 'block' : 'none'};">
-                <table class="runnerFormTable">
-                    <tr class="groupingTitle">
-                        <td colspan="2">
-                            Proxy configuration
-                        </td>
-                    </tr>
-                    <tr>
-                        <th> <label for="proxyHost">Host</label> </th>
-                        <td>
-                            <forms:textField name="proxyHost" value="${settingsManager.globalSettings.proxy.host}"/>
-                            <span class="error" id="invalidProxyHost"></span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th> <label for="proxyPort">Port</label> </th>
-                        <td>
-                            <c:set var="port" value=""/>
-                            <c:if test="${settingsManager.globalSettings.proxy.port != -1}">
-                                <c:set var="port" value="${settingsManager.globalSettings.proxy.port}"/>
-                            </c:if>
-                            <forms:textField name="proxyPort" value="${port}" />
-                            <span class="error" id="invalidProxyPort"></span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th> <label for="proxyUsername">Username</label> </th>
-                        <td>
-                            <forms:textField name="proxyUsername" value="${settingsManager.globalSettings.proxy.username}"/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th> <label for="proxyPassword">Password</label> </th>
-                        <td>
-                            <forms:passwordField name="proxyPassword"/>
-                            <span class="error" id="invalidProxyPassword"></span>
-                        </td>
-                    </tr>
-                </table>
-            </div>
 
             <div class="saveButtonsBlock">
                 <input class="submitButton" type="submit" value="Save">

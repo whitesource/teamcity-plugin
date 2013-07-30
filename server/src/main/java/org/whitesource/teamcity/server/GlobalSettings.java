@@ -29,6 +29,8 @@ public class GlobalSettings {
 
     private boolean checkPolicies;
 
+    private String serviceUrl;
+
     @XStreamAlias("Proxy")
     private ProxySettings proxy;
 
@@ -56,6 +58,14 @@ public class GlobalSettings {
 
     public void setCheckPolicies(boolean checkPolicies) {
         this.checkPolicies = checkPolicies;
+    }
+
+    public String getServiceUrl() {
+        return serviceUrl;
+    }
+
+    public void setServiceUrl(String serviceUrl) {
+        this.serviceUrl = serviceUrl;
     }
 
     public ProxySettings getProxy() {
