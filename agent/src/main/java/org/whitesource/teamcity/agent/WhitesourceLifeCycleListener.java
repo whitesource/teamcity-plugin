@@ -111,7 +111,7 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
                 "global".equals(overrideCheckPolicies)) {
             shouldCheckPolicies = Boolean.parseBoolean(runnerParameters.get(Constants.RUNNER_CHECK_POLICIES));
         } else {
-            shouldCheckPolicies = "enabled".equals(overrideCheckPolicies);
+            shouldCheckPolicies = "enable".equals(overrideCheckPolicies);
         }
 
         String product = runnerParameters.get(Constants.RUNNER_PRODUCT);
