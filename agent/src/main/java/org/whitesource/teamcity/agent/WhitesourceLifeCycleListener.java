@@ -185,8 +185,14 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
 
     private WhitesourceService createServiceClient(BuildRunnerContext runner) {
         Map<String, String> runnerParameters = runner.getRunnerParameters();
-        String serviceUrl = runnerParameters.get(Constants.RUNNER_SERVICE_URL);
-        WhitesourceService service = new WhitesourceService(Constants.AGENT_TYPE, Constants.AGENT_VERSION, serviceUrl);
+        String url = runnerParameters.get(Constants.RUNNER_SERVICE_URL);
+        if (StringUtils.isNotBlank(url)){
+            if (!url.endsWith("/")) {
+                url += "/";
+            }
+            url += "agent";
+        }
+        WhitesourceService service = new WhitesourceService(Constants.AGENT_TYPE, Constants.AGENT_VERSION, url);
 
         String proxyHost = runnerParameters.get(Constants.RUNNER_PROXY_HOST);
         if (!StringUtil.isEmptyOrSpaces(proxyHost)) {
