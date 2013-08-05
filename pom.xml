@@ -316,10 +316,6 @@
                     <groupId>org.whitesource</groupId>
                     <artifactId>whitesource-maven-plugin</artifactId>
                     <version>1.1.6</version>
-                    <configuration>
-                        <product>TeamCity plugin - 7.0+</product>
-                        <checkPolicies>true</checkPolicies>
-                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>com.mycila.maven-license-plugin</groupId>
@@ -363,11 +359,8 @@
                         <artifactId>whitesource-maven-plugin</artifactId>
                         <configuration>
                             <orgToken>${whitesource.orgToken}</orgToken>
-                            <moduleTokens>
-                                <common>2a7370d9-cacc-4e72-9754-3ecb0e167717</common>
-                                <server>b3c5abd6-8cf8-4536-a9c0-4f6a93cb823c</server>
-                                <agent>7d985fb4-9893-4e1c-b727-e13a07d1b83c</agent>
-                            </moduleTokens>
+                            <product>TeamCity plugin - ${teamcity.version}</product>
+                            <checkPolicies>true</checkPolicies>
                             <excludes>
                                 <exclude>assembly</exclude>
                             </excludes>
