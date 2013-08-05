@@ -4,7 +4,7 @@
 
     <groupId>org.whitesource.teamcity</groupId>
     <artifactId>parent</artifactId>
-    <version>1.1.2-SNAPSHOT</version>
+    <version>1.1.2</version>
     <packaging>pom</packaging>
 
     <name>White Source TeamCity plugin</name>
@@ -23,7 +23,8 @@
         <connection>scm:git:git@github.com:whitesource/teamcity-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:whitesource/teamcity-plugin.git</developerConnection>
         <url>git@github.com:whitesource/teamcity-plugin.git</url>
-    </scm>
+      <tag>release-tag-1.1.2</tag>
+  </scm>
     <issueManagement>
         <url>https://github.com/whitesource/teamcity-plugin/issues</url>
         <system>GitHub Issues</system>
