@@ -15,11 +15,9 @@
  */
 package org.whitesource.teamcity.server;
 
-import com.intellij.openapi.util.text.StringUtil;
 import jetbrains.buildServer.serverSide.BuildStartContext;
 import jetbrains.buildServer.serverSide.BuildStartContextProcessor;
 import jetbrains.buildServer.serverSide.SRunnerContext;
-import jetbrains.buildServer.serverSide.TeamCityProperties;
 import org.jetbrains.annotations.NotNull;
 import org.whitesource.teamcity.common.Constants;
 
@@ -38,20 +36,17 @@ public class WhitesourceBuildStartContextProcessor implements BuildStartContextP
 
     /**
      * Constructor
-     *
-     * @param settingsManager
      */
     public WhitesourceBuildStartContextProcessor(@NotNull final GlobalSettingsManager settingsManager) {
         this.settingsManager = settingsManager;
     }
 
+    /* --- Interface implementation methods --- */
+
     @Override
     public void updateParameters(@NotNull BuildStartContext context) {
-
         GlobalSettings globalSettings = settingsManager.getGlobalSettings();
-        if (globalSettings == null) {
-            return;
-        }
+        if (globalSettings == null) { return; }
 
         String orgToken = globalSettings.getOrgToken();
         String serviceUrl = globalSettings.getServiceUrl();
@@ -59,20 +54,25 @@ public class WhitesourceBuildStartContextProcessor implements BuildStartContextP
         ProxySettings proxy = globalSettings.getProxy();
 
         for (SRunnerContext runnerContext : context.getRunnerContexts()) {
-            runnerContext.addRunnerParameter(Constants.RUNNER_ORGANIZATION_TOKEN, orgToken);
-            runnerContext.addRunnerParameter(Constants.RUNNER_CHECK_POLICIES, Boolean.toString(checkPolicies));
-            if (!StringUtil.isEmptyOrSpaces(serviceUrl)) {
-                runnerContext.addRunnerParameter(Constants.RUNNER_SERVICE_URL, serviceUrl);
-            }
+            safeAddRunnerParameter(runnerContext, Constants.RUNNER_ORGANIZATION_TOKEN, orgToken);
+            safeAddRunnerParameter(runnerContext, Constants.RUNNER_SERVICE_URL, serviceUrl);
+            safeAddRunnerParameter(runnerContext, Constants.RUNNER_CHECK_POLICIES, Boolean.toString(checkPolicies));
 
             if (proxy != null) {
-                runnerContext.addRunnerParameter(Constants.RUNNER_PROXY_HOST, proxy.getHost());
-                runnerContext.addRunnerParameter(Constants.RUNNER_PROXY_PORT, Integer.valueOf(proxy.getPort()).toString());
-                runnerContext.addRunnerParameter(Constants.RUNNER_PROXY_USERNAME, proxy.getUsername());
-                runnerContext.addRunnerParameter(Constants.RUNNER_PROXY_PASSWORD, proxy.getPassword());
+                safeAddRunnerParameter(runnerContext, Constants.RUNNER_PROXY_HOST, proxy.getHost());
+                safeAddRunnerParameter(runnerContext, Constants.RUNNER_PROXY_PORT, Integer.valueOf(proxy.getPort()).toString());
+                safeAddRunnerParameter(runnerContext, Constants.RUNNER_PROXY_USERNAME, proxy.getUsername());
+                safeAddRunnerParameter(runnerContext, Constants.RUNNER_PROXY_PASSWORD, proxy.getPassword());
             }
         }
+    }
 
+    /* --- Private methods --- */
+
+    private void safeAddRunnerParameter(SRunnerContext runnerContext, String key, String value) {
+        if (value != null) {
+            runnerContext.addRunnerParameter(key, value);
+        }
     }
 
 }

@@ -34,7 +34,7 @@ import java.net.URL;
  *
  * @author Edo.Shor
  */
-public class    GlobalSettingsController extends BaseFormXmlController {
+public class GlobalSettingsController extends BaseFormXmlController {
 
     /* --- Members --- */
 
@@ -115,11 +115,6 @@ public class    GlobalSettingsController extends BaseFormXmlController {
 
         String host = request.getParameter("proxyHost");
         if (!StringUtil.isEmptyOrSpaces(host)) {
-
-            if (!isValidUrl(host)) {
-                errors.addError("invalidProxyHost", "Host must be a valid url.");
-            }
-
             String proxyPort = request.getParameter("proxyPort");
             if (!StringUtil.isEmptyOrSpaces(proxyPort)) {
                 if (StringUtil.isNumber(proxyPort)) {
@@ -130,12 +125,6 @@ public class    GlobalSettingsController extends BaseFormXmlController {
                 } else {
                     errors.addError("invalidProxyPort", "Port must be a valid number");
                 }
-            }
-
-            String username = request.getParameter("proxyUsername");
-            if (!StringUtil.isEmptyOrSpaces(username) &&
-                    StringUtil.isEmptyOrSpaces(request.getParameter("encryptedProxyPassword"))) {
-                errors.addError("invalidProxyPassword", "Password must be set if a username is specified.");
             }
         }
 

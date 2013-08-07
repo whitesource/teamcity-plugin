@@ -21,7 +21,6 @@ import jetbrains.buildServer.agent.*;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.util.EventDispatcher;
 import jetbrains.buildServer.util.StringUtil;
-import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.util.CollectionUtils;
 import org.whitesource.agent.api.dispatch.CheckPoliciesResult;
@@ -100,14 +99,14 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
         }
         if (StringUtil.isEmptyOrSpaces(orgToken)) {
             stopBuildOnError((AgentRunningBuildEx) build,
-                    new IllegalStateException("Empty organization token. Please make sure an organization token is defined for this runner"));
+                    new IllegalStateException("Empty organization token. Please make sure an organization token is defined for this runner."));
             return;
         }
 
         // should we check policies first ?
         boolean shouldCheckPolicies;
         String overrideCheckPolicies = runnerParameters.get(Constants.RUNNER_OVERRIDE_CHECK_POLICIES);
-        if (StringUtils.isBlank(overrideCheckPolicies) ||
+        if (StringUtil.isEmptyOrSpaces(overrideCheckPolicies) ||
                 "global".equals(overrideCheckPolicies)) {
             shouldCheckPolicies = Boolean.parseBoolean(runnerParameters.get(Constants.RUNNER_CHECK_POLICIES));
         } else {
@@ -186,7 +185,7 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
     private WhitesourceService createServiceClient(BuildRunnerContext runner) {
         Map<String, String> runnerParameters = runner.getRunnerParameters();
         String url = runnerParameters.get(Constants.RUNNER_SERVICE_URL);
-        if (StringUtils.isNotBlank(url)){
+        if (!StringUtil.isEmptyOrSpaces(url)){
             if (!url.endsWith("/")) {
                 url += "/";
             }
