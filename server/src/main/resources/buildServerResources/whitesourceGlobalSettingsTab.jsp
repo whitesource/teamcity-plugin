@@ -45,19 +45,9 @@
                     SettingsForm.highlightErrorField($("serviceUrl"));
                 },
 
-                onInvalidProxyHostError: function(elem) {
-                    $("invalidProxyHost").innerHTML = elem.firstChild.nodeValue;
-                    SettingsForm.highlightErrorField($("proxyHost"));
-                },
-
                 onInvalidProxyPortError: function(elem) {
                     $("invalidProxyPort").innerHTML = elem.firstChild.nodeValue;
                     SettingsForm.highlightErrorField($("proxyPort"));
-                },
-
-                onInvalidProxyPasswordError: function(elem) {
-                    $("invalidProxyPassword").innerHTML = elem.firstChild.nodeValue;
-                    SettingsForm.highlightErrorField($("proxyPassword"));
                 },
 
                 onSuccessfulSave: function() {
@@ -164,10 +154,7 @@
                             <table>
                                 <tr>
                                     <th> <label for="proxyHost">Host</label> </th>
-                                    <td>
-                                        <forms:textField name="proxyHost" value="${settingsManager.globalSettings.proxy.host}"/>
-                                        <span class="error" id="invalidProxyHost"></span>
-                                    </td>
+                                    <td><forms:textField name="proxyHost" value="${settingsManager.globalSettings.proxy.host}"/></td>
                                 </tr>
                                 <tr>
                                     <th> <label for="proxyPort">Port</label> </th>
@@ -182,16 +169,11 @@
                                 </tr>
                                 <tr>
                                     <th> <label for="proxyUsername">Username</label> </th>
-                                    <td>
-                                        <forms:textField name="proxyUsername" value="${settingsManager.globalSettings.proxy.username}"/>
-                                    </td>
+                                    <td><forms:textField name="proxyUsername" value="${settingsManager.globalSettings.proxy.username}"/></td>
                                 </tr>
                                 <tr>
                                     <th> <label for="proxyPassword">Password</label> </th>
-                                    <td>
-                                        <forms:passwordField name="proxyPassword"/>
-                                        <span class="error" id="invalidProxyPassword"></span>
-                                    </td>
+                                    <td><forms:passwordField name="proxyPassword"/></td>
                                 </tr>
                             </table>
                         </div>
