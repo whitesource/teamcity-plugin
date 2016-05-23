@@ -25,7 +25,7 @@ public final class Constants {
     /* --- Plugin constants --- */
     public static final String PLUGIN_NAME = "whitesource";
     public static final String AGENT_TYPE = "teamcity";
-    public static final String AGENT_VERSION = "2.1.0";
+    public static final String AGENT_VERSION = "2.3.0";
 
     /* --- Runner parameters --- */
     public static final String PLUGIN_PREFIX = "org.whitesource.";

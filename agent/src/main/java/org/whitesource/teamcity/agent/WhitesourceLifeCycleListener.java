@@ -191,9 +191,11 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
             }
             url += "agent";
         }
-        WhitesourceService service = new WhitesourceService(Constants.AGENT_TYPE, Constants.AGENT_VERSION, url);
-
+        // TODO
         String proxyHost = runnerParameters.get(Constants.RUNNER_PROXY_HOST);
+        boolean setProxy = !StringUtil.isEmptyOrSpaces(proxyHost) ? true : false;
+        WhitesourceService service = new WhitesourceService(Constants.AGENT_TYPE, Constants.AGENT_VERSION, url, setProxy);
+
         if (!StringUtil.isEmptyOrSpaces(proxyHost)) {
             int port = Integer.parseInt(runnerParameters.get(Constants.RUNNER_PROXY_PORT));
             String username = runnerParameters.get(Constants.RUNNER_PROXY_USERNAME);

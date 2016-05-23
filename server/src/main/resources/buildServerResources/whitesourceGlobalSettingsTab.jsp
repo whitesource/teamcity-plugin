@@ -45,6 +45,11 @@
                     SettingsForm.highlightErrorField($("serviceUrl"));
                 },
 
+                onInvalidConnectionTimeoutMinutes: function(elem) {
+                    $("invalidConnectionTimeoutMinutes").innerHTML = elem.firstChild.nodeValue;
+                    SettingsForm.highlightErrorField($("connectionTimeoutMinutes"));
+                },
+
                 onInvalidProxyPortError: function(elem) {
                     $("invalidProxyPort").innerHTML = elem.firstChild.nodeValue;
                     SettingsForm.highlightErrorField($("proxyPort"));
@@ -136,6 +141,24 @@
                         <div class="smallNote" style="margin-left: 0;">
                             Optional. Url to on premise installation of White Source.
                             SaaS accounts should leave this field blank.
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        <label for="connectionTimeoutMinutes">
+                            Connection Timeout
+                        </label>
+                    </th>
+                    <td>
+                        <c:set var="connectionTimeoutMinutes" value=""/>
+                        <c:if test="${settingsManager.globalSettings.connectionTimeoutMinutes != -1}">
+                            <c:set var="connectionTimeoutMinutes" value="${settingsManager.globalSettings.connectionTimeoutMinutes"/>
+                        </c:if>
+                        <forms:textField name="connectionTimeoutMinutes" value="${settingsManager.globalSettings.connectionTimeoutMinutes}" style="width:300px;" size="255"/>
+                        <div class="smallNote" style="margin-left: 0;">
+                            <span class="error" id="invalidConnectionTimeoutMinutes"></span>
+                            Optional. Default value is 60 min. Connection timeout is defined in minutes.
                         </div>
                     </td>
                 </tr>

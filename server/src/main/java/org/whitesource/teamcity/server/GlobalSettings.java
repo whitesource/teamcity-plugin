@@ -34,6 +34,8 @@ public class GlobalSettings {
     @XStreamAlias("Proxy")
     private ProxySettings proxy;
 
+    private int connectionTimeoutMinutes;
+
     /* --- Constructors--- */
 
     /**
@@ -74,5 +76,13 @@ public class GlobalSettings {
 
     public void setProxy(ProxySettings proxy) {
         this.proxy = proxy;
+    }
+
+    public int getConnectionTimeoutMinutes() {
+        return connectionTimeoutMinutes;
+    }
+
+    public void setConnectionTimeoutMinutes(int connectionTimeoutMinutes) {
+        this.connectionTimeoutMinutes = connectionTimeoutMinutes;
     }
 }

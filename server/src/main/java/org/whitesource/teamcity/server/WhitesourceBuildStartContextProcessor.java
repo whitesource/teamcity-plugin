@@ -15,6 +15,7 @@
  */
 package org.whitesource.teamcity.server;
 
+import com.sun.xml.internal.ws.util.StringUtils;
 import jetbrains.buildServer.serverSide.BuildStartContext;
 import jetbrains.buildServer.serverSide.BuildStartContextProcessor;
 import jetbrains.buildServer.serverSide.SRunnerContext;
@@ -52,11 +53,14 @@ public class WhitesourceBuildStartContextProcessor implements BuildStartContextP
         String serviceUrl = globalSettings.getServiceUrl();
         boolean checkPolicies = globalSettings.isCheckPolicies();
         ProxySettings proxy = globalSettings.getProxy();
+        int connectionTimeoutMinutes = globalSettings.getConnectionTimeoutMinutes();
 
         for (SRunnerContext runnerContext : context.getRunnerContexts()) {
             safeAddRunnerParameter(runnerContext, Constants.RUNNER_ORGANIZATION_TOKEN, orgToken);
             safeAddRunnerParameter(runnerContext, Constants.RUNNER_SERVICE_URL, serviceUrl);
             safeAddRunnerParameter(runnerContext, Constants.RUNNER_CHECK_POLICIES, Boolean.toString(checkPolicies));
+            //TODO check with tom the constants
+            safeAddRunnerParameter(runnerContext, Constants.CONNECTION_TIMEOUT_MINUTES, Integer.valueOf(connectionTimeoutMinutes).toString());
 
             if (proxy != null) {
                 safeAddRunnerParameter(runnerContext, Constants.RUNNER_PROXY_HOST, proxy.getHost());

@@ -74,6 +74,7 @@ public class GlobalSettingsController extends BaseFormXmlController {
         settings.setOrgToken(request.getParameter("orgToken"));
         settings.setCheckPolicies(Boolean.parseBoolean(request.getParameter("checkPolicies")));
         settings.setServiceUrl(request.getParameter("serviceUrl"));
+        settings.setConnectionTimeoutMinutes(request.getParameter("connectionTimeoutMinutes"));
 
         String proxyHost = request.getParameter("proxyHost");
         if (!StringUtil.isEmptyOrSpaces(proxyHost)){
@@ -111,6 +112,11 @@ public class GlobalSettingsController extends BaseFormXmlController {
         final String serviceUrl = request.getParameter("serviceUrl");
         if (!StringUtil.isEmptyOrSpaces(serviceUrl) && !isValidUrl(serviceUrl)) {
             errors.addError("invalidServiceUrl", "Service Url is not a valid URL");
+        }
+
+        final int connectionTimeoutMinutes = Integer.parseInt(request.getParameter("connectionTimeoutMinutes"));
+        if (connectionTimeoutMinutes <= 0) {
+            errors.addError("invalidconnectionTimeoutMinutes", "Connection timeout is not valid, must be grater than zero");
         }
 
         String host = request.getParameter("proxyHost");

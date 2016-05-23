@@ -12,7 +12,7 @@
     <name>Agent</name>
 
     <properties>
-        <agents.version>2.1.0</agents.version>
+        <agents.version>2.3.0-SNAPSHOT</agents.version>
     </properties>
 
     <dependencies>
