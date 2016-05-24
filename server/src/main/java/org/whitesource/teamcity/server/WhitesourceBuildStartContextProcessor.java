@@ -15,7 +15,6 @@
  */
 package org.whitesource.teamcity.server;
 
-import com.sun.xml.internal.ws.util.StringUtils;
 import jetbrains.buildServer.serverSide.BuildStartContext;
 import jetbrains.buildServer.serverSide.BuildStartContextProcessor;
 import jetbrains.buildServer.serverSide.SRunnerContext;
