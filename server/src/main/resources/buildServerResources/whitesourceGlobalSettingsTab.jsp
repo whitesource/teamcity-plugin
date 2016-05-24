@@ -45,7 +45,7 @@
                     SettingsForm.highlightErrorField($("serviceUrl"));
                 },
 
-                onInvalidConnectionTimeoutMinutes: function(elem) {
+                onInvalidConnectionTimeoutMinutesError: function(elem) {
                     $("invalidConnectionTimeoutMinutes").innerHTML = elem.firstChild.nodeValue;
                     SettingsForm.highlightErrorField($("connectionTimeoutMinutes"));
                 },
@@ -151,14 +151,14 @@
                         </label>
                     </th>
                     <td>
-                        <c:set var="connectionTimeoutMinutes" value=""/>
-                        <c:if test="${settingsManager.globalSettings.connectionTimeoutMinutes != -1}">
-                            <c:set var="connectionTimeoutMinutes" value="${settingsManager.globalSettings.connectionTimeoutMinutes"/>
+                        <c:set var="connectionTimeout" value=""/>
+                        <c:if test="${settingsManager.globalSettings.connectionTimeoutMinutes > 0}">
+                            <c:set var="connectionTimeout" value="${settingsManager.globalSettings.connectionTimeoutMinutes}"/>
                         </c:if>
-                        <forms:textField name="connectionTimeoutMinutes" value="${settingsManager.globalSettings.connectionTimeoutMinutes}" style="width:300px;" size="255"/>
+                        <forms:textField name="connectionTimeoutMinutes" value="${connectionTimeout}" style="width:300px;" size="255"/>
                         <div class="smallNote" style="margin-left: 0;">
                             <span class="error" id="invalidConnectionTimeoutMinutes"></span>
-                            Optional. Default value is 60 min. Connection timeout is defined in minutes.
+                            Optional. Default value is 60 min. Connection timeout is measured in minutes.
                         </div>
                     </td>
                 </tr>

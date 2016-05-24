@@ -45,6 +45,7 @@ public class GlobalSettingsTest {
         proxy.setUsername("username");
         proxy.setPassword("password");
         settings.setProxy(proxy);
+        settings.setConnectionTimeoutMinutes(111);
 
         tmpSettings = saveAndLoad(settings);
         assertNotNull(tmpSettings);
@@ -53,6 +54,7 @@ public class GlobalSettingsTest {
         assertEquals(settings.getProxy().getPort(), tmpSettings.getProxy().getPort());
         assertEquals(settings.getProxy().getUsername(), tmpSettings.getProxy().getUsername());
         assertEquals(settings.getProxy().getPassword(), tmpSettings.getProxy().getPassword());
+        assertEquals(settings.getConnectionTimeoutMinutes(), tmpSettings.getConnectionTimeoutMinutes());
     }
 
     private GlobalSettings saveAndLoad(GlobalSettings settings) {

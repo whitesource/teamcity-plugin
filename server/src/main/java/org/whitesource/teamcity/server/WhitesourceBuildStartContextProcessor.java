@@ -59,8 +59,7 @@ public class WhitesourceBuildStartContextProcessor implements BuildStartContextP
             safeAddRunnerParameter(runnerContext, Constants.RUNNER_ORGANIZATION_TOKEN, orgToken);
             safeAddRunnerParameter(runnerContext, Constants.RUNNER_SERVICE_URL, serviceUrl);
             safeAddRunnerParameter(runnerContext, Constants.RUNNER_CHECK_POLICIES, Boolean.toString(checkPolicies));
-            //TODO check with tom the constants
-            safeAddRunnerParameter(runnerContext, Constants.CONNECTION_TIMEOUT_MINUTES, Integer.valueOf(connectionTimeoutMinutes).toString());
+            safeAddRunnerParameter(runnerContext, Constants.RUNNER_CONNECTION_TIMEOUT_MINUTES, Integer.valueOf(connectionTimeoutMinutes).toString());
 
             if (proxy != null) {
                 safeAddRunnerParameter(runnerContext, Constants.RUNNER_PROXY_HOST, proxy.getHost());

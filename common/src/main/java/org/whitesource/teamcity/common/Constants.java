@@ -46,6 +46,7 @@ public final class Constants {
     public static final String RUNNER_PROXY_USERNAME = PLUGIN_PREFIX + "proxyUsername";
     public static final String RUNNER_PROXY_PASSWORD = PLUGIN_PREFIX + "proxyPassword";
     public static final String RUNNER_SERVICE_URL = PLUGIN_PREFIX + "serviceUrl";
+    public static final String RUNNER_CONNECTION_TIMEOUT_MINUTES = PLUGIN_PREFIX + "connectionTimeoutMinutes";
 
 
     /* --- Runner types --- */
