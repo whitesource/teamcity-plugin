@@ -27,7 +27,7 @@ public class GlobalSettings {
 
     private String orgToken;
 
-    private boolean checkPolicies;
+    private String checkPolicies;
 
     private String serviceUrl;
 
@@ -54,13 +54,20 @@ public class GlobalSettings {
         this.orgToken = orgToken;
     }
 
-    public boolean isCheckPolicies() {
+    public String getCheckPolicies() {
         return checkPolicies;
     }
 
-    public void setCheckPolicies(boolean checkPolicies) {
+    public void setCheckPolicies(String checkPolicies) {
         this.checkPolicies = checkPolicies;
     }
+//    public boolean isCheckPolicies() {
+//        return checkPolicies;
+//    }
+//
+//    public void setCheckPolicies(boolean checkPolicies) {
+//        this.checkPolicies = checkPolicies;
+//    }
 
     public String getServiceUrl() {
         return serviceUrl;

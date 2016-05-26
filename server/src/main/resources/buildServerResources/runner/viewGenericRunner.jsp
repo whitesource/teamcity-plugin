@@ -53,7 +53,7 @@
         </strong>
     </div>
     <div class="nestedParameter" style="${doUpdate ? '' : 'display:none;'}">
-        Check policies:
+        Check policy compliance:
         <strong>
             <c:out value="${empty overrideCheckPolicies ? 'from global configuration' : overrideCheckPolicies}"/>
         </strong>

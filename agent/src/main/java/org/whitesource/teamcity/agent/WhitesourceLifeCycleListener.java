@@ -24,6 +24,7 @@ import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.util.CollectionUtils;
 import org.whitesource.agent.api.dispatch.CheckPoliciesResult;
+import org.whitesource.agent.api.dispatch.CheckPolicyComplianceResult;
 import org.whitesource.agent.api.dispatch.UpdateInventoryResult;
 import org.whitesource.agent.api.model.AgentProjectInfo;
 import org.whitesource.agent.api.model.DependencyInfo;
@@ -47,6 +48,10 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
     /* --- Static members --- */
 
     private static final String LOG_COMPONENT = "LifeCycleListener";
+
+    public static final String GLOBAL = "global";
+    public static final String ENABLE_NEW = "enableNew";
+    public static final String ENABLE_ALL = "enableAll";
 
     private ExtensionHolder extensionHolder;
 
@@ -104,13 +109,18 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
         }
 
         // should we check policies first ?
-        boolean shouldCheckPolicies;
+        boolean shouldCheckPolicies = false;
+        boolean checkAllLibraries = false;
+        String policiesValue;
+
         String overrideCheckPolicies = runnerParameters.get(Constants.RUNNER_OVERRIDE_CHECK_POLICIES);
-        if (StringUtil.isEmptyOrSpaces(overrideCheckPolicies) ||
-                "global".equals(overrideCheckPolicies)) {
-            shouldCheckPolicies = Boolean.parseBoolean(runnerParameters.get(Constants.RUNNER_CHECK_POLICIES));
+        if (StringUtil.isEmptyOrSpaces(overrideCheckPolicies) || GLOBAL.equals(overrideCheckPolicies)) {
+            policiesValue = runnerParameters.get(Constants.RUNNER_CHECK_POLICIES);
+            shouldCheckPolicies = ENABLE_NEW.equals(policiesValue) || ENABLE_ALL.equals(policiesValue);
+            checkAllLibraries =  ENABLE_ALL.equals(policiesValue);
         } else {
-            shouldCheckPolicies = "enable".equals(overrideCheckPolicies);
+            shouldCheckPolicies = ENABLE_NEW.equals(overrideCheckPolicies) || ENABLE_ALL.equals(overrideCheckPolicies);
+            checkAllLibraries =  ENABLE_ALL.equals(overrideCheckPolicies);
         }
 
         String product = runnerParameters.get(Constants.RUNNER_PRODUCT);
@@ -139,7 +149,8 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
             try{
                 if (shouldCheckPolicies) {
                     buildLogger.message("Checking policies");
-                    CheckPoliciesResult result = service.checkPolicies(orgToken, product, productVersion, projectInfos);
+//                    CheckPoliciesResult result = service.checkPolicies(orgToken, product, productVersion, projectInfos);
+                    CheckPolicyComplianceResult result = service.checkPolicyCompliance(orgToken, product ,productVersion, projectInfos, checkAllLibraries);
                     policyCheckReport(runner, result);
                     if (result.hasRejections()) {
                         stopBuild((AgentRunningBuildEx) build, "Open source rejected by organization policies.");
@@ -173,6 +184,18 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
        Map<File, String> artifactsToPublish = new HashMap<File, String>();
        artifactsToPublish.put(reportArchive, "");
        publisher.publishFiles(artifactsToPublish);
+    }
+
+    private void policyCheckReport(BuildRunnerContext runner, CheckPolicyComplianceResult result) throws IOException {
+        AgentRunningBuild build = runner.getBuild();
+
+        PolicyCheckReport report = new PolicyCheckReport(result, build.getProjectName(), build.getBuildNumber());
+        File reportArchive = report.generate(build.getBuildTempDirectory(), true);
+
+        ArtifactsPublisher publisher = extensionHolder.getExtensions(ArtifactsPublisher.class).iterator().next();
+        Map<File, String> artifactsToPublish = new HashMap<File, String>();
+        artifactsToPublish.put(reportArchive, "");
+        publisher.publishFiles(artifactsToPublish);
     }
 
     /* --- Private methods --- */

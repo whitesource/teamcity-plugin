@@ -99,7 +99,7 @@
                 <tr>
                     <th>
                         <label for="orgToken">
-                            Organization token
+                            Organization Token
                             <l:star/>
                             <bs:helpIcon iconTitle="Tokens can be found in the administration section of your account on White Source."/>
                         </label>
@@ -113,12 +113,15 @@
                 <tr>
                     <th>
                         <label for="checkPolicies">
-                            Check policies
+                            Check policy compliance
                             <bs:helpIcon iconTitle="Require premium account."/>
                         </label>
                     </th>
                     <td>
-                        <forms:checkbox name="checkPolicies" checked="${settingsManager.globalSettings.checkPolicies}"/>
+                        <props:radioButtonProperty name="checkPolicies" value="enableNew"/> Check only new libraries
+                        <props:radioButtonProperty name="checkPolicies" value="enableAll"/> Force check all libraries
+                        <props:radioButtonProperty name="checkPolicies" value="disable"/> Disable
+                        <%--<forms:checkbox name="checkPolicies" checked="${settingsManager.globalSettings.checkPolicies}"/>--%>
                         <div class="smallNote" style="margin-left: 0;">
                             Fail the build if an open source library is rejected by an organization policy.
                             <br/>

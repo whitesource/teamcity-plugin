@@ -23,6 +23,7 @@
 <c:set var="product" value="${propertiesBean.properties['org.whitesource.product']}" />
 <c:set var="productVersion" value="${propertiesBean.properties['org.whitesource.productVersion']}" />
 <c:set var="overrideOrgToken" value="${propertiesBean.properties['org.whitesource.overrideOrgToken']}" />
+<c:set var="overrideCheckPolicies" value="${propertiesBean.properties['org.whitesource.overrideCheckPolicies']}" />
 <c:set var="projectToken" value="${propertiesBean.properties['org.whitesource.projectToken']}" />
 <c:set var="moduleTokens" value="${propertiesBean.properties['org.whitesource.moduleTokens']}" />
 <c:set var="includes" value="${propertiesBean.properties['org.whitesource.includes']}" />
@@ -54,7 +55,7 @@
         </strong>
     </div>
     <div class="nestedParameter" style="${doUpdate ? '' : 'display:none;'}">
-        Check policies:
+        Check policy compliance:
         <strong>
             <c:out value="${empty overrideCheckPolicies ? 'from global configuration' : overrideCheckPolicies}"/>
         </strong>
