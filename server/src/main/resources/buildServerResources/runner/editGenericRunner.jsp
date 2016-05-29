@@ -91,6 +91,10 @@
     <tr id="containerOverrideCheckPolicies" style="${showSettings ? '' : 'display: none;'}">
         <th>
             Check policy compliance:
+            <bs:helpIcon iconTitle="<b>Use global settings</b> - Override this property from the global configuration.<br/>
+                            <b>Check only new libraries</b> - Check that the newly introduced open source libraries conform with organization policies.<br/>
+                            <b>Force check all libraries</b> - Check that all introduced open source libraries conform with organization policies.<br/>
+                            <b>Disable</b> - Disable policies check when updating WhiteSource."/>
         </th>
         <td>
             <props:radioButtonProperty name="org.whitesource.overrideCheckPolicies" value="global"/> Use Global Settings

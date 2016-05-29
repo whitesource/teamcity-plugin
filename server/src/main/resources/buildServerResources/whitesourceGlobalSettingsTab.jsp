@@ -16,6 +16,7 @@
 
 --%>
 <%@include file="/include.jsp" %>
+<%@ taglib prefix="props" tagdir="/WEB-INF/tags/props" %>
 
 <jsp:useBean id="settingsManager" type="org.whitesource.teamcity.server.GlobalSettingsManager" scope="request"/>
 
@@ -113,15 +114,21 @@
                 <tr>
                     <th>
                         <label for="checkPolicies">
-                            Check policy compliance
-                            <bs:helpIcon iconTitle="Require premium account."/>
+                            Check Policy Compliance
+                            <bs:helpIcon iconTitle="Require premium account.<br/>
+                            <b>Check only new libraries</b> - Check that the newly introduced open source libraries conform with organization policies.<br/>
+                            <b>Force check all libraries</b> - Check that all introduced open source libraries conform with organization policies.<br/>
+                            <b>Disable</b> - Disable policies check when updating WhiteSource."/>
                         </label>
                     </th>
                     <td>
-                        <props:radioButtonProperty name="checkPolicies" value="enableNew"/> Check only new libraries
-                        <props:radioButtonProperty name="checkPolicies" value="enableAll"/> Force check all libraries
-                        <props:radioButtonProperty name="checkPolicies" value="disable"/> Disable
-                        <%--<forms:checkbox name="checkPolicies" checked="${settingsManager.globalSettings.checkPolicies}"/>--%>
+                        <input id="checkPolicies" name="checkPolicies" type="radio" value="enableNew"
+                               ${settingsManager.globalSettings.checkPolicies=='enableNew'?'checked':''}/> Check only new libraries
+                        <input id="checkPolicies" name="checkPolicies" type="radio" value="enableAll"
+                               ${settingsManager.globalSettings.checkPolicies=='enableAll'?'checked':''}/> Force check all libraries
+                        <input id="checkPolicies" name="checkPolicies" type="radio" value="disable"
+                               ${settingsManager.globalSettings.checkPolicies=='disable'?'checked':''}/> Disable
+                        <%--<forms:radiobutton name="checkPolicies" value="${settingsManager.globalSettings.checkPolicies}"/>--%>
                         <div class="smallNote" style="margin-left: 0;">
                             Fail the build if an open source library is rejected by an organization policy.
                             <br/>
