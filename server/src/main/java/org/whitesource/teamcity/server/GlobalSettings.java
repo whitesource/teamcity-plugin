@@ -29,6 +29,8 @@ public class GlobalSettings {
 
     private String checkPolicies;
 
+    private String forceUpdate;
+
     private String serviceUrl;
 
     @XStreamAlias("Proxy")
@@ -91,5 +93,13 @@ public class GlobalSettings {
 
     public void setConnectionTimeoutMinutes(int connectionTimeoutMinutes) {
         this.connectionTimeoutMinutes = connectionTimeoutMinutes;
+    }
+
+    public String getForceUpdate() {
+        return forceUpdate;
+    }
+
+    public void setForceUpdate(String forceUpdate) {
+        this.forceUpdate = forceUpdate;
     }
 }

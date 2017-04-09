@@ -108,6 +108,23 @@
             </span>
         </td>
     </tr>
+    <tr id="containerOverrideForceUpdate" style="${showSettings ? '' : 'display: none;'}">
+        <th>
+            Force update:
+            <bs:helpIcon iconTitle="<b>Use global settings</b> - Override this property from the global configuration.<br/>
+                            <b>Force update</b> - Updates organization inventory regardless of policy violations.<br/>
+                            <b>Update</b> - Updates inventory only when the newly introduced open source libraries conform with
+                    organization policies."/>
+        </th>
+        <td>
+            <props:radioButtonProperty name="org.whitesource.overrideForceUpdate" value="global"/> Use Global Settings
+            <props:radioButtonProperty name="org.whitesource.overrideForceUpdate" value="forceUpdate"/> Force update
+            <props:radioButtonProperty name="org.whitesource.overrideForceUpdate" value="update"/> Update
+            <span class="smallNote">
+                Optional. Override force update in global settings.
+            </span>
+        </td>
+    </tr>
     <tr id="containerProjectToken" style="${showSettings ? '' : 'display: none;'}">
         <th>
             <label for="org.whitesource.projectToken">

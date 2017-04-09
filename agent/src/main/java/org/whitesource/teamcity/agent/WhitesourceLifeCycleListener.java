@@ -52,6 +52,7 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
     public static final String GLOBAL = "global";
     public static final String ENABLE_NEW = "enableNew";
     public static final String ENABLE_ALL = "enableAll";
+    public static final String JOB_FORCE_UPDATE = "forceUpdate";
 
     private ExtensionHolder extensionHolder;
 
@@ -109,8 +110,9 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
         }
 
         // should we check policies first ?
-        boolean shouldCheckPolicies = false;
-        boolean checkAllLibraries = false;
+        boolean shouldCheckPolicies;
+        boolean checkAllLibraries;
+        boolean isForceUpdate;
         String policiesValue;
 
         String overrideCheckPolicies = runnerParameters.get(Constants.RUNNER_OVERRIDE_CHECK_POLICIES);
@@ -121,6 +123,13 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
         } else {
             shouldCheckPolicies = ENABLE_NEW.equals(overrideCheckPolicies) || ENABLE_ALL.equals(overrideCheckPolicies);
             checkAllLibraries =  ENABLE_ALL.equals(overrideCheckPolicies);
+        }
+
+        String jobForceUpdate = runnerParameters.get(Constants.RUNNER_OVERRIDE_FORCE_UPDATE);
+        if (StringUtil.isEmptyOrSpaces(jobForceUpdate) || GLOBAL.equals(jobForceUpdate)) {
+            isForceUpdate = !StringUtil.isEmptyOrSpaces(runnerParameters.get(Constants.RUNNER_FORCE_UPDATE));
+        } else {
+            isForceUpdate = JOB_FORCE_UPDATE.equals(jobForceUpdate);
         }
 
         String product = runnerParameters.get(Constants.RUNNER_PRODUCT);
@@ -152,10 +161,14 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
 //                    CheckPoliciesResult result = service.checkPolicies(orgToken, product, productVersion, projectInfos);
                     CheckPolicyComplianceResult result = service.checkPolicyCompliance(orgToken, product ,productVersion, projectInfos, checkAllLibraries);
                     policyCheckReport(runner, result);
-                    if (result.hasRejections()) {
+                    boolean hasRejections = result.hasRejections();
+                    if (hasRejections && !isForceUpdate) {
                         stopBuild((AgentRunningBuildEx) build, "Open source rejected by organization policies.");
                     } else {
-                        buildLogger.message("All dependencies conform with open source policies.");
+                        String message = hasRejections ? "Some dependencies violate open source policies, however all" +
+                                " were force updated to organization inventory." :
+                                "All dependencies conform with open source policies.";
+                        buildLogger.message(message);
                         sendUpdate(orgToken, product, productVersion, projectInfos, service, buildLogger);
                     }
                 } else {

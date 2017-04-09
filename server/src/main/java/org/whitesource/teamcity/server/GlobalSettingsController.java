@@ -73,6 +73,7 @@ public class GlobalSettingsController extends BaseFormXmlController {
         final GlobalSettings settings = new GlobalSettings();
         settings.setOrgToken(request.getParameter("orgToken"));
         settings.setCheckPolicies(request.getParameter("checkPolicies"));
+        settings.setForceUpdate(request.getParameter("forceUpdate"));
         settings.setServiceUrl(request.getParameter("serviceUrl"));
 
         String connectionTimeoutMinutes = request.getParameter("connectionTimeoutMinutes");

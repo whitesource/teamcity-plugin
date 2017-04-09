@@ -23,17 +23,21 @@ package org.whitesource.teamcity.common;
 public final class Constants {
 
     /* --- Plugin constants --- */
+
     public static final String PLUGIN_NAME = "whitesource";
     public static final String AGENT_TYPE = "teamcity";
     public static final String AGENT_VERSION = "2.3.0";
 
     /* --- Runner parameters --- */
+
     public static final String PLUGIN_PREFIX = "org.whitesource.";
     public static final String RUNNER_DO_UPDATE = PLUGIN_PREFIX + "doUpdate";
     public static final String RUNNER_ORGANIZATION_TOKEN = PLUGIN_PREFIX + "orgToken";
     public static final String RUNNER_OVERRIDE_ORGANIZATION_TOKEN = PLUGIN_PREFIX + "overrideOrgToken";
     public static final String RUNNER_CHECK_POLICIES = PLUGIN_PREFIX + "checkPolicies";
     public static final String RUNNER_OVERRIDE_CHECK_POLICIES = PLUGIN_PREFIX + "overrideCheckPolicies";
+    public static final String RUNNER_FORCE_UPDATE = PLUGIN_PREFIX + "forceUpdate";
+    public static final String RUNNER_OVERRIDE_FORCE_UPDATE = PLUGIN_PREFIX + "overrideForceUpdate";
     public static final String RUNNER_PRODUCT = PLUGIN_PREFIX + "product";
     public static final String RUNNER_PRODUCT_VERSION = PLUGIN_PREFIX + "productVersion";
     public static final String RUNNER_PROJECT_TOKEN = PLUGIN_PREFIX + "projectToken";
