@@ -27,6 +27,7 @@
         $('containerProductVersion').toggle();
         $('containerOverrideOrgToken').toggle();
         $('containerOverrideCheckPolicies').toggle();
+        $('containerOverrideForceUpdate').toggle();
         $('containerProjectToken').toggle();
         $('containerModuleTokens').toggle();
         $('containerIncludes').toggle();
