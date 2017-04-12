@@ -171,6 +171,7 @@ public class GenericOssInfoExtractor extends BaseOssInfoExtractor {
 
         try {
             info.setSha1(ChecksumUtils.calculateSHA1(file));
+            info.setOtherPlatformSha1(ChecksumUtils.calculateOtherPlatformSha1(file));
         } catch (IOException e) {
             String msg = "Error calculating SHA-1 for " + file.getAbsolutePath();
             Loggers.AGENT.warn(WssUtils.logMsg(LOG_COMPONENT, msg));

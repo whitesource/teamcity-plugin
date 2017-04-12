@@ -240,7 +240,9 @@ public class MavenOssInfoExtractor extends BaseOssInfoExtractor {
                 if (!StringUtil.isEmptyOrSpaces(dependencyPath)) {
                     info.setSystemPath(dependencyPath);
                     try {
-                        info.setSha1(ChecksumUtils.calculateSHA1(new File(dependencyPath)));
+                        File resourceFile = new File(dependencyPath);
+                        info.setSha1(ChecksumUtils.calculateSHA1(resourceFile));
+                        info.setOtherPlatformSha1(ChecksumUtils.calculateOtherPlatformSha1(resourceFile));
                     } catch (IOException e) {
                         Loggers.AGENT.debug("Unable to calculate SHA-1 for " + dependencyPath);
                     }
