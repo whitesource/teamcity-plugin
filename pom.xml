@@ -338,9 +338,9 @@
                         <execution>
                             <id>sign</id>
                             <phase>package</phase>
-                            <goals>
-                                <goal>sign</goal>
-                            </goals>
+                            <!--<goals>-->
+                                <!--<goal>sign</goal>-->
+                            <!--</goals>-->
                         </execution>
                     </executions>
                     <configuration>
