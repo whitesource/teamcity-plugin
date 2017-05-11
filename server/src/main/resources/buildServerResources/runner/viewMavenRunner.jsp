@@ -25,6 +25,7 @@
 <c:set var="overrideOrgToken" value="${propertiesBean.properties['org.whitesource.overrideOrgToken']}" />
 <c:set var="overrideCheckPolicies" value="${propertiesBean.properties['org.whitesource.overrideCheckPolicies']}" />
 <c:set var="overrideForceUpdate" value="${propertiesBean.properties['org.whitesource.overrideForceUpdate']}" />
+<c:set var="overrideFailOnError" value="${propertiesBean.properties['org.whitesource.overrideFailOnError']}" />
 <c:set var="projectToken" value="${propertiesBean.properties['org.whitesource.projectToken']}" />
 <c:set var="moduleTokens" value="${propertiesBean.properties['org.whitesource.moduleTokens']}" />
 <c:set var="includes" value="${propertiesBean.properties['org.whitesource.includes']}" />
@@ -65,6 +66,12 @@
         Force update:
         <strong>
             <c:out value="${empty overrideForceUpdate ? 'from global configuration' : overrideForceUpdate}"/>
+        </strong>
+    </div>
+    <div class="nestedParameter" style="${doUpdate ? '' : 'display:none;'}">
+        Force update:
+        <strong>
+            <c:out value="${empty overrideFailOnError ? 'from global configuration' : overrideFailOnError}"/>
         </strong>
     </div>
     <div class="nestedParameter" style="${doUpdate and not empty projectToken ? '' : 'display:none;'}">

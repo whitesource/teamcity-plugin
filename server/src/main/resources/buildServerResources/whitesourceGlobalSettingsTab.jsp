@@ -151,7 +151,19 @@
                     </th>
                     <td>
                         <input id="forceUpdate" name="forceUpdate" type="checkbox" value="forceUpdate"
-                            ${settingsManager.globalSettings.forceUpdate=='forceUpdate'?'checked':''}/>
+                            ${settingsManager.globalSettings.forceUpdate =='forceUpdate'?'checked':''}/>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        <label for="failOnError">
+                            Fail on error
+                            <bs:helpIcon iconTitle="Indicates whether to fail the build on a general error (e.g. network error)."/>
+                        </label>
+                    </th>
+                    <td>
+                        <input id="failOnError" name="failOnError" type="checkbox" value="failOnError"
+                            ${settingsManager.globalSettings.failOnError =='failOnError'?'checked':''}/>
                     </td>
                 </tr>
                 <tr class="groupingTitle">

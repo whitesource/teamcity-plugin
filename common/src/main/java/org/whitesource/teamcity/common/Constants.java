@@ -37,7 +37,9 @@ public final class Constants {
     public static final String RUNNER_CHECK_POLICIES = PLUGIN_PREFIX + "checkPolicies";
     public static final String RUNNER_OVERRIDE_CHECK_POLICIES = PLUGIN_PREFIX + "overrideCheckPolicies";
     public static final String RUNNER_FORCE_UPDATE = PLUGIN_PREFIX + "forceUpdate";
+    public static final String RUNNER_FAIL_ON_ERROR = PLUGIN_PREFIX + "failOnError";
     public static final String RUNNER_OVERRIDE_FORCE_UPDATE = PLUGIN_PREFIX + "overrideForceUpdate";
+    public static final String RUNNER_OVERRIDE_FAIL_ON_ERROR = PLUGIN_PREFIX + "overrideFailOnError";
     public static final String RUNNER_PRODUCT = PLUGIN_PREFIX + "product";
     public static final String RUNNER_PRODUCT_VERSION = PLUGIN_PREFIX + "productVersion";
     public static final String RUNNER_PROJECT_TOKEN = PLUGIN_PREFIX + "projectToken";

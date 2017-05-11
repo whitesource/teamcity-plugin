@@ -31,6 +31,8 @@ public class GlobalSettings {
 
     private String forceUpdate;
 
+    private String failOnError;
+
     private String serviceUrl;
 
     @XStreamAlias("Proxy")
@@ -101,5 +103,13 @@ public class GlobalSettings {
 
     public void setForceUpdate(String forceUpdate) {
         this.forceUpdate = forceUpdate;
+    }
+
+    public String getFailOnError() {
+        return failOnError;
+    }
+
+    public void setFailOnError(String failOnError) {
+        this.failOnError = failOnError;
     }
 }

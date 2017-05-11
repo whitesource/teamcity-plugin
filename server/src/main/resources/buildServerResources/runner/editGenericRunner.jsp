@@ -27,6 +27,7 @@
         $('containerProductVersion').toggle();
         $('containerOverrideOrgToken').toggle();
         $('containerOverrideCheckPolicies').toggle();
+        $('containerOverrideFailOnError').toggle();
         $('containerProjectToken').toggle();
         $('containerIncludes').toggle();
         $('containerExcludes').toggle();
@@ -118,6 +119,22 @@
             <props:radioButtonProperty name="org.whitesource.overrideForceUpdate" value="global"/> Use Global Settings
             <props:radioButtonProperty name="org.whitesource.overrideForceUpdate" value="forceUpdate"/> Force update
             <props:radioButtonProperty name="org.whitesource.overrideForceUpdate" value="update"/> Update
+            <span class="smallNote">
+                Optional. Override force update in global settings.
+            </span>
+        </td>
+    </tr>
+    <tr id="containerOverrideFailOnError" style="${showSettings ? '' : 'display: none;'}">
+        <th>
+            Fail on error:
+            <bs:helpIcon iconTitle="<b>Use global settings</b> - Override this property from the global configuration.<br/>
+                            <b>Fail on error</b> - Indicates whether to fail the build on a general error (e.g. network error).<br/>
+                            <b>Do not fail the build</b> - Do not fail the build, even if there are general errors (e.g. network, plugin)."/>
+        </th>
+        <td>
+            <props:radioButtonProperty name="org.whitesource.overrideFailOnError" value="global"/> Use Global Settings
+            <props:radioButtonProperty name="org.whitesource.overrideFailOnError" value="failOnError"/> Fail on error
+            <props:radioButtonProperty name="org.whitesource.overrideFailOnError" value="dontFailBuild"/> Do not fail the build
             <span class="smallNote">
                 Optional. Override force update in global settings.
             </span>

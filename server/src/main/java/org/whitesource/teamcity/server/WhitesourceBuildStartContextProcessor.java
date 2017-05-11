@@ -52,6 +52,7 @@ public class WhitesourceBuildStartContextProcessor implements BuildStartContextP
         String serviceUrl = globalSettings.getServiceUrl();
         String checkPolicies = globalSettings.getCheckPolicies();
         String forceUpdate = globalSettings.getForceUpdate();
+        String failOnError = globalSettings.getFailOnError();
 //        boolean checkPolicies = globalSettings.isCheckPolicies();
         ProxySettings proxy = globalSettings.getProxy();
         int connectionTimeoutMinutes = globalSettings.getConnectionTimeoutMinutes();
@@ -61,6 +62,7 @@ public class WhitesourceBuildStartContextProcessor implements BuildStartContextP
             safeAddRunnerParameter(runnerContext, Constants.RUNNER_SERVICE_URL, serviceUrl);
             safeAddRunnerParameter(runnerContext, Constants.RUNNER_CHECK_POLICIES, checkPolicies);
             safeAddRunnerParameter(runnerContext, Constants.RUNNER_FORCE_UPDATE, forceUpdate);
+            safeAddRunnerParameter(runnerContext, Constants.RUNNER_FAIL_ON_ERROR, failOnError);
 //            safeAddRunnerParameter(runnerContext, Constants.RUNNER_CHECK_POLICIES, Boolean.toString(checkPolicies));
             safeAddRunnerParameter(runnerContext, Constants.RUNNER_CONNECTION_TIMEOUT_MINUTES, Integer.valueOf(connectionTimeoutMinutes).toString());
 

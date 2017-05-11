@@ -23,7 +23,6 @@ import jetbrains.buildServer.util.EventDispatcher;
 import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.util.CollectionUtils;
-import org.whitesource.agent.api.dispatch.CheckPoliciesResult;
 import org.whitesource.agent.api.dispatch.CheckPolicyComplianceResult;
 import org.whitesource.agent.api.dispatch.UpdateInventoryResult;
 import org.whitesource.agent.api.model.AgentProjectInfo;
@@ -53,6 +52,7 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
     public static final String ENABLE_NEW = "enableNew";
     public static final String ENABLE_ALL = "enableAll";
     public static final String JOB_FORCE_UPDATE = "forceUpdate";
+    public static final String JOB_FAIL_ON_ERROR = "failOnError";
 
     private ExtensionHolder extensionHolder;
 
@@ -132,6 +132,9 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
             isForceUpdate = JOB_FORCE_UPDATE.equals(jobForceUpdate);
         }
 
+        boolean failOnError = isFailOnError(runnerParameters.get(Constants.RUNNER_OVERRIDE_FAIL_ON_ERROR),
+                runnerParameters.get(Constants.RUNNER_FAIL_ON_ERROR));
+
         String product = runnerParameters.get(Constants.RUNNER_PRODUCT);
         String productVersion = runnerParameters.get(Constants.RUNNER_PRODUCT_VERSION);
 
@@ -158,18 +161,26 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
             try{
                 if (shouldCheckPolicies) {
                     buildLogger.message("Checking policies");
-//                    CheckPoliciesResult result = service.checkPolicies(orgToken, product, productVersion, projectInfos);
                     CheckPolicyComplianceResult result = service.checkPolicyCompliance(orgToken, product ,productVersion, projectInfos, checkAllLibraries);
                     policyCheckReport(runner, result);
                     boolean hasRejections = result.hasRejections();
+                    String message;
                     if (hasRejections && !isForceUpdate) {
-                        stopBuild((AgentRunningBuildEx) build, "Open source rejected by organization policies.");
+                        message = "Open source rejected by organization policies.";
+                        if (failOnError) {
+                            stopBuild((AgentRunningBuildEx) build, message);
+                        } else {
+                            buildLogger.message(message);
+                        }
                     } else {
-                        String message = hasRejections ? "Some dependencies violate open source policies, however all" +
+                        message = hasRejections ? "Some dependencies violate open source policies, however all" +
                                 " were force updated to organization inventory." :
                                 "All dependencies conform with open source policies.";
                         buildLogger.message(message);
                         sendUpdate(orgToken, product, productVersion, projectInfos, service, buildLogger);
+                        if (failOnError) {
+                            stopBuild((AgentRunningBuildEx) build, "Build failed due to policy violations.");
+                        }
                     }
                 } else {
                     sendUpdate(orgToken, product, productVersion, projectInfos, service, buildLogger);
@@ -187,16 +198,16 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
         }
     }
 
-    private void policyCheckReport(BuildRunnerContext runner, CheckPoliciesResult result) throws IOException {
-        AgentRunningBuild build = runner.getBuild();
+    /* --- Private methods --- */
 
-       PolicyCheckReport report = new PolicyCheckReport(result, build.getProjectName(), build.getBuildNumber());
-       File reportArchive = report.generate(build.getBuildTempDirectory(), true);
-
-       ArtifactsPublisher publisher = extensionHolder.getExtensions(ArtifactsPublisher.class).iterator().next();
-       Map<File, String> artifactsToPublish = new HashMap<File, String>();
-       artifactsToPublish.put(reportArchive, "");
-       publisher.publishFiles(artifactsToPublish);
+    private boolean isFailOnError(String jobFailOnError, String globalFailOnError) {
+        boolean doFailOnError;
+        if (StringUtil.isEmptyOrSpaces(jobFailOnError) || GLOBAL.equals(jobFailOnError)) {
+            doFailOnError = !StringUtil.isEmptyOrSpaces(globalFailOnError);
+        } else {
+            doFailOnError = JOB_FAIL_ON_ERROR.equals(jobFailOnError);
+        }
+        return doFailOnError;
     }
 
     private void policyCheckReport(BuildRunnerContext runner, CheckPolicyComplianceResult result) throws IOException {
@@ -210,8 +221,6 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
         artifactsToPublish.put(reportArchive, "");
         publisher.publishFiles(artifactsToPublish);
     }
-
-    /* --- Private methods --- */
 
     private boolean shouldUpdate(BuildRunnerContext runner) {
         String shouldUpdate = runner.getRunnerParameters().get(Constants.RUNNER_DO_UPDATE);
