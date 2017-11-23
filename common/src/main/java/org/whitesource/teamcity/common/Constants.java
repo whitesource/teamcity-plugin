@@ -26,7 +26,6 @@ public final class Constants {
 
     public static final String PLUGIN_NAME = "whitesource";
     public static final String AGENT_TYPE = "teamcity";
-    public static final String AGENT_VERSION = "2.3.0";
 
     /* --- Runner parameters --- */
 

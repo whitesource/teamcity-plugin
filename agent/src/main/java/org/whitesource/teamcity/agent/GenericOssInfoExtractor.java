@@ -21,10 +21,12 @@ import jetbrains.buildServer.agent.BuildRunnerContext;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.util.FileUtil;
 import jetbrains.buildServer.util.StringUtil;
-import org.whitesource.agent.api.ChecksumUtils;
+import org.whitesource.agent.api.model.ChecksumType;
+import org.whitesource.agent.hash.ChecksumUtils;
 import org.whitesource.agent.api.model.AgentProjectInfo;
 import org.whitesource.agent.api.model.Coordinates;
 import org.whitesource.agent.api.model.DependencyInfo;
+import org.whitesource.agent.hash.HashCalculator;
 import org.whitesource.teamcity.common.WssUtils;
 
 import java.io.File;
@@ -45,6 +47,8 @@ public class GenericOssInfoExtractor extends BaseOssInfoExtractor {
     private static final String LOG_COMPONENT = "GenericExtractor";
 
     private static final List<String> DEFAULT_SCAN_EXTENSIONS = new ArrayList<String>();
+    private static final String JAVA_SCRIPT_REGEX = ".*\\.js";
+
     static {
         DEFAULT_SCAN_EXTENSIONS.addAll(
                 Arrays.asList("jar", "war", "ear", "par", "rar",
@@ -130,7 +134,7 @@ public class GenericOssInfoExtractor extends BaseOssInfoExtractor {
 
     private void extractOssInfo(final File absoluteRoot, final File root, final Collection<DependencyInfo> dependencyInfos) {
         final File[] files = root.listFiles();
-        if (files == null){
+        if (files == null) {
             return;
         }
 
@@ -170,8 +174,24 @@ public class GenericOssInfoExtractor extends BaseOssInfoExtractor {
         info.setArtifactId(file.getName());
 
         try {
+            String filename = file.getAbsolutePath();
+            // handle JavaScript files
+            if (filename.toLowerCase().matches(JAVA_SCRIPT_REGEX)) {
+                Map<ChecksumType, String> javaScriptChecksums = new HashMap<ChecksumType, String>();
+                try {
+                    javaScriptChecksums = new HashCalculator().calculateJavaScriptHashes(file);
+                } catch (Exception ex) {
+                    Loggers.AGENT.info("Failed to calculate javaScript file hash for :" + file.getAbsolutePath().toString());
+                    Loggers.AGENT.debug("Failed to calculate javaScript hash for file: " + file.getAbsolutePath().toString() + ", error: " + ex.toString());
+                }
+                for (Map.Entry<ChecksumType, String> entry : javaScriptChecksums.entrySet()) {
+                    info.addChecksum(entry.getKey(), entry.getValue());
+                }
+            }
+
             info.setSha1(ChecksumUtils.calculateSHA1(file));
             info.setOtherPlatformSha1(ChecksumUtils.calculateOtherPlatformSha1(file));
+            ChecksumUtils.calculateSuperHash(info, file);
         } catch (IOException e) {
             String msg = "Error calculating SHA-1 for " + file.getAbsolutePath();
             Loggers.AGENT.warn(WssUtils.logMsg(LOG_COMPONENT, msg));

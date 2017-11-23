@@ -21,9 +21,11 @@ import jetbrains.buildServer.agent.*;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.util.EventDispatcher;
 import jetbrains.buildServer.util.StringUtil;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.util.CollectionUtils;
 import org.whitesource.agent.api.dispatch.CheckPolicyComplianceResult;
+import org.whitesource.agent.api.dispatch.UpdateInventoryRequest;
 import org.whitesource.agent.api.dispatch.UpdateInventoryResult;
 import org.whitesource.agent.api.model.AgentProjectInfo;
 import org.whitesource.agent.api.model.DependencyInfo;
@@ -33,11 +35,11 @@ import org.whitesource.agent.report.PolicyCheckReport;
 import org.whitesource.teamcity.common.Constants;
 import org.whitesource.teamcity.common.WssUtils;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.InputStream;
+import java.util.*;
 
 /**
  * @author Edo.Shor
@@ -48,11 +50,14 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
 
     private static final String LOG_COMPONENT = "LifeCycleListener";
 
-    public static final String GLOBAL = "global";
-    public static final String ENABLE_NEW = "enableNew";
-    public static final String ENABLE_ALL = "enableAll";
-    public static final String JOB_FORCE_UPDATE = "forceUpdate";
-    public static final String JOB_FAIL_ON_ERROR = "failOnError";
+    private static final String GLOBAL = "global";
+    private static final String ENABLE_NEW = "enableNew";
+    private static final String ENABLE_ALL = "enableAll";
+    private static final String JOB_FORCE_UPDATE = "forceUpdate";
+    private static final String JOB_FAIL_ON_ERROR = "failOnError";
+    private static final String AGENTS_VERSION = "agentsVersion";
+    private static final String VERSION = "version";
+    private final Properties properties;
 
     private ExtensionHolder extensionHolder;
 
@@ -63,6 +68,7 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
      */
     public WhitesourceLifeCycleListener(@NotNull final EventDispatcher<AgentLifeCycleListener> eventDispatcher,
                                         @NotNull final ExtensionHolder extensionHolder) {
+        properties = getProperties();
         this.extensionHolder = extensionHolder;
         eventDispatcher.addListener(this);
     }
@@ -240,7 +246,8 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
         boolean setProxy = !StringUtil.isEmptyOrSpaces(proxyHost) ? true : false;
         int connectionTimeoutMinutes = Integer.parseInt(runnerParameters.get(Constants.RUNNER_CONNECTION_TIMEOUT_MINUTES));
 
-        WhitesourceService service = new WhitesourceService(Constants.AGENT_TYPE, Constants.AGENT_VERSION, url,
+
+        WhitesourceService service = new WhitesourceService(Constants.AGENT_TYPE, getAgentsVersion() ,getPluginVersion(),  url,
                 setProxy, connectionTimeoutMinutes);
 
         if (!StringUtil.isEmptyOrSpaces(proxyHost)) {
@@ -271,6 +278,12 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
         logger.message(StringUtil.join(result.getCreatedProjects(), ","));
         logger.message(result.getUpdatedProjects().size() + " existing projects were updated:");
         logger.message(StringUtil.join(result.getUpdatedProjects(), ","));
+
+        // support token
+        String requestToken = result.getRequestToken();
+        if (StringUtils.isNotBlank(requestToken)) {
+            logger.message("Support Token: "+ requestToken);
+        }
     }
 
     private void stopBuildOnError(AgentRunningBuildEx build, Exception e) {
@@ -310,5 +323,46 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
         }
         log.info("----------------- dump finished -----------------");
 
+    }
+
+    private String getAgentsVersion() {
+        return getResource(AGENTS_VERSION);
+    }
+
+    private String getPluginVersion() {
+        return getResource(VERSION);
+    }
+
+    private String getResource(String propertyName) {
+        String val = (properties.getProperty(propertyName));
+        if(StringUtils.isNotBlank(val)){
+            return val;
+        }
+        return "";
+    }
+
+    private Properties getProperties() {
+        Properties properties = new Properties();
+        InputStream stream = null;
+        try {
+            stream = WhitesourceLifeCycleListener.class.getResourceAsStream("/project.properties");
+            properties.load(stream);
+            stream.close();
+        }
+        catch (IOException e) {
+            Loggers.AGENT.error("Failed to get version ", e);
+        }
+        finally {
+            closeStream(stream);
+        }
+        return properties;
+    }
+
+    public void closeStream(Closeable s){
+        try{
+            if(s!=null)s.close();
+        }catch(IOException e){
+            Loggers.AGENT.error("Failed to close stream ", e);
+        }
     }
 }

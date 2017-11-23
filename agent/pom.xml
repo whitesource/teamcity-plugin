@@ -12,7 +12,7 @@
     <name>Agent</name>
 
     <properties>
-        <agents.version>2.3.3</agents.version>
+        <agents.version>2.4.5</agents.version>
     </properties>
 
     <dependencies>
@@ -118,6 +118,12 @@
                 <artifactId>maven-jarsigner-plugin</artifactId>
             </plugin>
         </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
     </build>
 
     <profiles>
