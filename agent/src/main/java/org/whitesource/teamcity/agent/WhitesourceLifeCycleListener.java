@@ -25,7 +25,6 @@ import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.util.CollectionUtils;
 import org.whitesource.agent.api.dispatch.CheckPolicyComplianceResult;
-import org.whitesource.agent.api.dispatch.UpdateInventoryRequest;
 import org.whitesource.agent.api.dispatch.UpdateInventoryResult;
 import org.whitesource.agent.api.model.AgentProjectInfo;
 import org.whitesource.agent.api.model.DependencyInfo;
@@ -105,13 +104,16 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
 
         // make sure we have an organization token
         Map<String, String> runnerParameters = runner.getRunnerParameters();
+        boolean failOnError = isFailOnError(runnerParameters.get(Constants.RUNNER_OVERRIDE_FAIL_ON_ERROR),
+                runnerParameters.get(Constants.RUNNER_FAIL_ON_ERROR));
+
         String orgToken = runnerParameters.get(Constants.RUNNER_OVERRIDE_ORGANIZATION_TOKEN);
         if (StringUtil.isEmptyOrSpaces(orgToken)) {
             orgToken = runnerParameters.get(Constants.RUNNER_ORGANIZATION_TOKEN);
         }
         if (StringUtil.isEmptyOrSpaces(orgToken)) {
             stopBuildOnError((AgentRunningBuildEx) build,
-                    new IllegalStateException("Empty organization token. Please make sure an organization token is defined for this runner."));
+                    new IllegalStateException("Empty organization token. Please make sure an organization token is defined for this runner."), failOnError);
             return;
         }
 
@@ -138,8 +140,6 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
             isForceUpdate = JOB_FORCE_UPDATE.equals(jobForceUpdate);
         }
 
-        boolean failOnError = isFailOnError(runnerParameters.get(Constants.RUNNER_OVERRIDE_FAIL_ON_ERROR),
-                runnerParameters.get(Constants.RUNNER_FAIL_ON_ERROR));
 
         String product = runnerParameters.get(Constants.RUNNER_PRODUCT);
         String productVersion = runnerParameters.get(Constants.RUNNER_PRODUCT_VERSION);
@@ -192,12 +192,12 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
                     sendUpdate(orgToken, product, productVersion, projectInfos, service, buildLogger);
                 }
             } catch (WssServiceException e) {
-                stopBuildOnError((AgentRunningBuildEx) build, e);
+                    stopBuildOnError((AgentRunningBuildEx) build, e, failOnError);
             } catch (IOException e) {
-                stopBuildOnError((AgentRunningBuildEx) build, e);
+                stopBuildOnError((AgentRunningBuildEx) build, e, failOnError);
             } catch (RuntimeException e) {
                 Loggers.AGENT.error(WssUtils.logMsg(LOG_COMPONENT, "Runtime Error"), e);
-                stopBuildOnError((AgentRunningBuildEx) build, e);
+                stopBuildOnError((AgentRunningBuildEx) build, e, failOnError);
             } finally {
                 service.shutdown();
             }
@@ -286,15 +286,21 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
         }
     }
 
-    private void stopBuildOnError(AgentRunningBuildEx build, Exception e) {
-        Loggers.AGENT.warn(WssUtils.logMsg(LOG_COMPONENT, "Stopping build"), e);
-
+    private void stopBuildOnError(AgentRunningBuildEx build, Exception e, boolean failOnError) {
         BuildProgressLogger logger = build.getBuildLogger();
         String errorMessage = e.getLocalizedMessage();
-        logger.buildFailureDescription(errorMessage);
-        logger.exception(e);
-        logger.flush();
-        build.stopBuild(errorMessage);
+        if (failOnError) {
+            Loggers.AGENT.warn(WssUtils.logMsg(LOG_COMPONENT, "Stopping build"), e);
+            logger.buildFailureDescription(errorMessage);
+            logger.exception(e);
+            logger.flush();
+            build.stopBuild(errorMessage);
+        } else {
+            logger.warning("Build won't fail, 'failOnError' parameter is set to false");
+            logger.warning(errorMessage);
+            logger.exception(e);
+            logger.flush();
+        }
     }
 
     private void stopBuild(AgentRunningBuildEx build, String message) {
