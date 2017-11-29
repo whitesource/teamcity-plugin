@@ -56,6 +56,8 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
     private static final String JOB_FAIL_ON_ERROR = "failOnError";
     private static final String AGENTS_VERSION = "agentsVersion";
     private static final String VERSION = "version";
+    private static final String TRUE = "true";
+    private static final String SKIP_WHITESOURCE_PLUGIN = "SKIP_WHITESOURCE_PLUGIN";
     private final Properties properties;
 
     private ExtensionHolder extensionHolder;
@@ -100,106 +102,111 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
         if (!shouldUpdate(runner)) { return; } // no need to update white source...
 
         final BuildProgressLogger buildLogger = build.getBuildLogger();
-        buildLogger.message("Updating White Source");
-
-        // make sure we have an organization token
-        Map<String, String> runnerParameters = runner.getRunnerParameters();
-        boolean failOnError = isFailOnError(runnerParameters.get(Constants.RUNNER_OVERRIDE_FAIL_ON_ERROR),
-                runnerParameters.get(Constants.RUNNER_FAIL_ON_ERROR));
-
-        String orgToken = runnerParameters.get(Constants.RUNNER_OVERRIDE_ORGANIZATION_TOKEN);
-        if (StringUtil.isEmptyOrSpaces(orgToken)) {
-            orgToken = runnerParameters.get(Constants.RUNNER_ORGANIZATION_TOKEN);
-        }
-        if (StringUtil.isEmptyOrSpaces(orgToken)) {
-            stopBuildOnError((AgentRunningBuildEx) build,
-                    new IllegalStateException("Empty organization token. Please make sure an organization token is defined for this runner."), failOnError);
-            return;
-        }
-
-        // should we check policies first ?
-        boolean shouldCheckPolicies;
-        boolean checkAllLibraries;
-        boolean isForceUpdate;
-        String policiesValue;
-
-        String overrideCheckPolicies = runnerParameters.get(Constants.RUNNER_OVERRIDE_CHECK_POLICIES);
-        if (StringUtil.isEmptyOrSpaces(overrideCheckPolicies) || GLOBAL.equals(overrideCheckPolicies)) {
-            policiesValue = runnerParameters.get(Constants.RUNNER_CHECK_POLICIES);
-            shouldCheckPolicies = ENABLE_NEW.equals(policiesValue) || ENABLE_ALL.equals(policiesValue);
-            checkAllLibraries =  ENABLE_ALL.equals(policiesValue);
+        String skipWhiteSource = runner.getBuildParameters().getEnvironmentVariables().get(SKIP_WHITESOURCE_PLUGIN);
+        if (skipWhiteSource != null && TRUE.equals(skipWhiteSource)) {
+            buildLogger.message(SKIP_WHITESOURCE_PLUGIN + "parameter is set to true, WhiteSource plugin won't run");
         } else {
-            shouldCheckPolicies = ENABLE_NEW.equals(overrideCheckPolicies) || ENABLE_ALL.equals(overrideCheckPolicies);
-            checkAllLibraries =  ENABLE_ALL.equals(overrideCheckPolicies);
-        }
+            buildLogger.message("Updating White Source");
 
-        String jobForceUpdate = runnerParameters.get(Constants.RUNNER_OVERRIDE_FORCE_UPDATE);
-        if (StringUtil.isEmptyOrSpaces(jobForceUpdate) || GLOBAL.equals(jobForceUpdate)) {
-            isForceUpdate = !StringUtil.isEmptyOrSpaces(runnerParameters.get(Constants.RUNNER_FORCE_UPDATE));
-        } else {
-            isForceUpdate = JOB_FORCE_UPDATE.equals(jobForceUpdate);
-        }
+            // make sure we have an organization token
+            Map<String, String> runnerParameters = runner.getRunnerParameters();
+            boolean failOnError = isFailOnError(runnerParameters.get(Constants.RUNNER_OVERRIDE_FAIL_ON_ERROR),
+                    runnerParameters.get(Constants.RUNNER_FAIL_ON_ERROR));
 
-
-        String product = runnerParameters.get(Constants.RUNNER_PRODUCT);
-        String productVersion = runnerParameters.get(Constants.RUNNER_PRODUCT_VERSION);
-
-        // collect OSS usage information
-        buildLogger.message("Collecting OSS usage information");
-        Collection<AgentProjectInfo> projectInfos;
-        if (WssUtils.isMavenRunType(runner.getRunType())) {
-            MavenOssInfoExtractor extractor = new MavenOssInfoExtractor(runner);
-            projectInfos = extractor.extract();
-            if (StringUtil.isEmptyOrSpaces(product)) {
-                product = extractor.getTopMostProjectName();
+            String orgToken = runnerParameters.get(Constants.RUNNER_OVERRIDE_ORGANIZATION_TOKEN);
+            if (StringUtil.isEmptyOrSpaces(orgToken)) {
+                orgToken = runnerParameters.get(Constants.RUNNER_ORGANIZATION_TOKEN);
             }
-        } else {
-            GenericOssInfoExtractor extractor = new GenericOssInfoExtractor(runner);
-            projectInfos = extractor.extract();
-        }
-        debugAgentProjectInfos(projectInfos);
+            if (StringUtil.isEmptyOrSpaces(orgToken)) {
+                stopBuildOnError((AgentRunningBuildEx) build,
+                        new IllegalStateException("Empty organization token. Please make sure an organization token is defined for this runner."), failOnError);
+                return;
+            }
 
-        // send to white source
-        if (CollectionUtils.isEmpty(projectInfos)) {
-            buildLogger.message("No open source information found.");
-        } else {
-            WhitesourceService service = createServiceClient(runner);
-            try{
-                if (shouldCheckPolicies) {
-                    buildLogger.message("Checking policies");
-                    CheckPolicyComplianceResult result = service.checkPolicyCompliance(orgToken, product ,productVersion, projectInfos, checkAllLibraries);
-                    policyCheckReport(runner, result);
-                    boolean hasRejections = result.hasRejections();
-                    String message;
-                    if (hasRejections && !isForceUpdate) {
-                        message = "Open source rejected by organization policies.";
-                        if (failOnError) {
-                            stopBuild((AgentRunningBuildEx) build, message);
+            // should we check policies first ?
+            boolean shouldCheckPolicies;
+            boolean checkAllLibraries;
+            boolean isForceUpdate;
+            String policiesValue;
+
+            String overrideCheckPolicies = runnerParameters.get(Constants.RUNNER_OVERRIDE_CHECK_POLICIES);
+            if (StringUtil.isEmptyOrSpaces(overrideCheckPolicies) || GLOBAL.equals(overrideCheckPolicies)) {
+                policiesValue = runnerParameters.get(Constants.RUNNER_CHECK_POLICIES);
+                shouldCheckPolicies = ENABLE_NEW.equals(policiesValue) || ENABLE_ALL.equals(policiesValue);
+                checkAllLibraries = ENABLE_ALL.equals(policiesValue);
+            } else {
+                shouldCheckPolicies = ENABLE_NEW.equals(overrideCheckPolicies) || ENABLE_ALL.equals(overrideCheckPolicies);
+                checkAllLibraries = ENABLE_ALL.equals(overrideCheckPolicies);
+            }
+
+            String jobForceUpdate = runnerParameters.get(Constants.RUNNER_OVERRIDE_FORCE_UPDATE);
+            if (StringUtil.isEmptyOrSpaces(jobForceUpdate) || GLOBAL.equals(jobForceUpdate)) {
+                isForceUpdate = !StringUtil.isEmptyOrSpaces(runnerParameters.get(Constants.RUNNER_FORCE_UPDATE));
+            } else {
+                isForceUpdate = JOB_FORCE_UPDATE.equals(jobForceUpdate);
+            }
+
+
+            String product = runnerParameters.get(Constants.RUNNER_PRODUCT);
+            String productVersion = runnerParameters.get(Constants.RUNNER_PRODUCT_VERSION);
+
+            // collect OSS usage information
+            buildLogger.message("Collecting OSS usage information");
+            Collection<AgentProjectInfo> projectInfos;
+            if (WssUtils.isMavenRunType(runner.getRunType())) {
+                MavenOssInfoExtractor extractor = new MavenOssInfoExtractor(runner);
+                projectInfos = extractor.extract();
+                if (StringUtil.isEmptyOrSpaces(product)) {
+                    product = extractor.getTopMostProjectName();
+                }
+            } else {
+                GenericOssInfoExtractor extractor = new GenericOssInfoExtractor(runner);
+                projectInfos = extractor.extract();
+            }
+            debugAgentProjectInfos(projectInfos);
+
+            // send to white source
+            if (CollectionUtils.isEmpty(projectInfos)) {
+                buildLogger.message("No open source information found.");
+            } else {
+                WhitesourceService service = createServiceClient(runner);
+                try {
+                    if (shouldCheckPolicies) {
+                        buildLogger.message("Checking policies");
+                        CheckPolicyComplianceResult result = service.checkPolicyCompliance(orgToken, product, productVersion, projectInfos, checkAllLibraries);
+                        policyCheckReport(runner, result);
+                        boolean hasRejections = result.hasRejections();
+                        String message;
+                        if (hasRejections && !isForceUpdate) {
+                            message = "Open source rejected by organization policies.";
+                            if (failOnError) {
+                                stopBuild((AgentRunningBuildEx) build, message);
+                            } else {
+                                buildLogger.message(message);
+                            }
                         } else {
+                            message = hasRejections ? "Some dependencies violate open source policies, however all" +
+                                    " were force updated to organization inventory." :
+                                    "All dependencies conform with open source policies.";
                             buildLogger.message(message);
+                            sendUpdate(orgToken, product, productVersion, projectInfos, service, buildLogger);
+                            if (failOnError) {
+                                stopBuild((AgentRunningBuildEx) build, "Build failed due to policy violations.");
+                            }
                         }
                     } else {
-                        message = hasRejections ? "Some dependencies violate open source policies, however all" +
-                                " were force updated to organization inventory." :
-                                "All dependencies conform with open source policies.";
-                        buildLogger.message(message);
                         sendUpdate(orgToken, product, productVersion, projectInfos, service, buildLogger);
-                        if (failOnError) {
-                            stopBuild((AgentRunningBuildEx) build, "Build failed due to policy violations.");
-                        }
                     }
-                } else {
-                    sendUpdate(orgToken, product, productVersion, projectInfos, service, buildLogger);
-                }
-            } catch (WssServiceException e) {
+                } catch (WssServiceException e) {
                     stopBuildOnError((AgentRunningBuildEx) build, e, failOnError);
-            } catch (IOException e) {
-                stopBuildOnError((AgentRunningBuildEx) build, e, failOnError);
-            } catch (RuntimeException e) {
-                Loggers.AGENT.error(WssUtils.logMsg(LOG_COMPONENT, "Runtime Error"), e);
-                stopBuildOnError((AgentRunningBuildEx) build, e, failOnError);
-            } finally {
-                service.shutdown();
+                } catch (IOException e) {
+                    stopBuildOnError((AgentRunningBuildEx) build, e, failOnError);
+                } catch (RuntimeException e) {
+                    Loggers.AGENT.error(WssUtils.logMsg(LOG_COMPONENT, "Runtime Error"), e);
+                    stopBuildOnError((AgentRunningBuildEx) build, e, failOnError);
+                } finally {
+                    service.shutdown();
+                }
             }
         }
     }
