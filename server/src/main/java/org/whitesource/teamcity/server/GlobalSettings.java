@@ -27,6 +27,8 @@ public class GlobalSettings {
 
     private String orgToken;
 
+    private String userKey;
+
     private String checkPolicies;
 
     private String forceUpdate;
@@ -111,5 +113,13 @@ public class GlobalSettings {
 
     public void setFailOnError(String failOnError) {
         this.failOnError = failOnError;
+    }
+
+    public String getUserKey() {
+        return userKey;
+    }
+
+    public void setUserKey(String userKey) {
+        this.userKey = userKey;
     }
 }

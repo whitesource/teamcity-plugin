@@ -123,6 +123,11 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
                 return;
             }
 
+            String userKey = runnerParameters.get(Constants.RUNNER_OVERRIDE_USER_KEY);
+            if (StringUtil.isEmptyOrSpaces(userKey)) {
+                userKey = runnerParameters.get(Constants.RUNNER_USER_KEY);
+            }
+
             // should we check policies first ?
             boolean shouldCheckPolicies;
             boolean checkAllLibraries;
@@ -173,7 +178,7 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
                 try {
                     if (shouldCheckPolicies) {
                         buildLogger.message("Checking policies");
-                        CheckPolicyComplianceResult result = service.checkPolicyCompliance(orgToken, product, productVersion, projectInfos, checkAllLibraries);
+                        CheckPolicyComplianceResult result = service.checkPolicyCompliance(orgToken, product, productVersion, projectInfos, checkAllLibraries, userKey);
                         policyCheckReport(runner, result);
                         boolean hasRejections = result.hasRejections();
                         String message;
@@ -189,13 +194,13 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
                                     " were force updated to organization inventory." :
                                     "All dependencies conform with open source policies.";
                             buildLogger.message(message);
-                            sendUpdate(orgToken, product, productVersion, projectInfos, service, buildLogger);
+                            sendUpdate(orgToken, product, productVersion, projectInfos, service, buildLogger, userKey);
                             if (failOnError) {
                                 stopBuild((AgentRunningBuildEx) build, "Build failed due to policy violations.");
                             }
                         }
                     } else {
-                        sendUpdate(orgToken, product, productVersion, projectInfos, service, buildLogger);
+                        sendUpdate(orgToken, product, productVersion, projectInfos, service, buildLogger, userKey);
                     }
                 } catch (WssServiceException e) {
                     stopBuildOnError((AgentRunningBuildEx) build, e, failOnError);
@@ -268,11 +273,11 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
     }
 
     private void sendUpdate(String orgToken, String product, String productVersion, Collection<AgentProjectInfo> projectInfos,
-                            WhitesourceService service, BuildProgressLogger buildLogger)
+                            WhitesourceService service, BuildProgressLogger buildLogger, String userKey)
             throws WssServiceException {
 
         buildLogger.message("Sending to White Source");
-        UpdateInventoryResult updateResult = service.update(orgToken, product, productVersion, projectInfos);
+        UpdateInventoryResult updateResult = service.update(orgToken, product, productVersion, projectInfos, userKey);
         logUpdateResult(updateResult, buildLogger);
     }
 

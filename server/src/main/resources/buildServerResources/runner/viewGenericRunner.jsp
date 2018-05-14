@@ -23,6 +23,7 @@
 <c:set var="product" value="${propertiesBean.properties['org.whitesource.product']}" />
 <c:set var="productVersion" value="${propertiesBean.properties['org.whitesource.productVersion']}" />
 <c:set var="overrideOrgToken" value="${propertiesBean.properties['org.whitesource.overrideOrgToken']}" />
+<c:set var="overrideUserKey" value="${propertiesBean.properties['org.whitesource.overrideUserKey']}" />
 <c:set var="overrideCheckPolicies" value="${propertiesBean.properties['org.whitesource.overrideCheckPolicies']}" />
 <c:set var="overrideForceUpdate" value="${propertiesBean.properties['org.whitesource.overrideForceUpdate']}" />
 <c:set var="overrideFailOnError" value="${propertiesBean.properties['org.whitesource.overrideFailOnError']}" />
@@ -52,6 +53,12 @@
         Organization token:
         <strong>
             <c:out value="${empty overrideOrgToken ? 'from global configuration' : overrideOrgToken}"/>
+        </strong>
+    </div>
+    <div class="nestedParameter" style="${doUpdate ? '' : 'display:none;'}">
+        User key:
+        <strong>
+            <c:out value="${empty overrideUserKey ? 'from global configuration' : overrideUserKey}"/>
         </strong>
     </div>
     <div class="nestedParameter" style="${doUpdate ? '' : 'display:none;'}">

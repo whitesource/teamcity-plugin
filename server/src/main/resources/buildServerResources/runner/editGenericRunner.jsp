@@ -26,6 +26,7 @@
         $('containerProduct').toggle();
         $('containerProductVersion').toggle();
         $('containerOverrideOrgToken').toggle();
+        $('containerOverrideUserKey').toggle();
         $('containerOverrideCheckPolicies').toggle();
         $('containerOverrideFailOnError').toggle();
         $('containerProjectToken').toggle();
@@ -86,6 +87,18 @@
             <props:textProperty name="org.whitesource.overrideOrgToken" size="55"/>
             <span class="smallNote">
                 Optional. Organization token to use instead of global settings.
+            </span>
+        </td>
+    </tr>
+    <tr id="containerOverrideUserKey" style="${showSettings ? '' : 'display: none;'}">
+        <th>
+            Override user Key:
+            <bs:helpIcon iconTitle="User Keys can be found in the profile section of your account on White Source."/>
+        </th>
+        <td>
+            <props:textProperty name="org.whitesource.overrideUserKey" size="55"/>
+            <span class="smallNote">
+                Unique identifier of user, can be generate from the profile page in your whitesource account.
             </span>
         </td>
     </tr>

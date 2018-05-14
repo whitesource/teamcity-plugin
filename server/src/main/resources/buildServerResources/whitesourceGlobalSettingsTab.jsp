@@ -117,6 +117,22 @@
                 </tr>
                 <tr>
                     <th>
+                        <label for="userKey">
+                            User key
+                            <bs:helpIcon
+                                    iconTitle="User Keys can be found under your profile section of your account on White Source."/>
+                        </label>
+                    </th>
+                    <td>
+                        <forms:textField name="userKey" value="${settingsManager.globalSettings.userKey}"
+                                         style="width:300px;"/>
+                        <span class="error" id="invalidUserKey"></span>
+                        <div class="smallNote" style="margin-left: 0;">Unique identifier of user, can be generate from the profile page in your whitesource account.
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
                         <label for="checkPolicies">
                             Check Policy Compliance
                             <bs:helpIcon iconTitle="Require premium account.<br/>

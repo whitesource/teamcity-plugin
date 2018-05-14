@@ -72,6 +72,7 @@ public class GlobalSettingsController extends BaseFormXmlController {
 
         final GlobalSettings settings = new GlobalSettings();
         settings.setOrgToken(request.getParameter("orgToken"));
+        settings.setUserKey(request.getParameter("userKey"));
         settings.setCheckPolicies(request.getParameter("checkPolicies"));
         settings.setForceUpdate(request.getParameter("forceUpdate"));
         settings.setFailOnError(request.getParameter("failOnError"));

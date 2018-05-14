@@ -33,6 +33,8 @@ public final class Constants {
     public static final String RUNNER_DO_UPDATE = PLUGIN_PREFIX + "doUpdate";
     public static final String RUNNER_ORGANIZATION_TOKEN = PLUGIN_PREFIX + "orgToken";
     public static final String RUNNER_OVERRIDE_ORGANIZATION_TOKEN = PLUGIN_PREFIX + "overrideOrgToken";
+    public static final String RUNNER_USER_KEY = PLUGIN_PREFIX + "userKey";
+    public static final String RUNNER_OVERRIDE_USER_KEY = PLUGIN_PREFIX + "overrideUserKey";
     public static final String RUNNER_CHECK_POLICIES = PLUGIN_PREFIX + "checkPolicies";
     public static final String RUNNER_OVERRIDE_CHECK_POLICIES = PLUGIN_PREFIX + "overrideCheckPolicies";
     public static final String RUNNER_FORCE_UPDATE = PLUGIN_PREFIX + "forceUpdate";

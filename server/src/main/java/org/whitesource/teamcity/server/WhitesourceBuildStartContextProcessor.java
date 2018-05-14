@@ -49,6 +49,7 @@ public class WhitesourceBuildStartContextProcessor implements BuildStartContextP
         if (globalSettings == null) { return; }
 
         String orgToken = globalSettings.getOrgToken();
+        String userKey = globalSettings.getUserKey();
         String serviceUrl = globalSettings.getServiceUrl();
         String checkPolicies = globalSettings.getCheckPolicies();
         String forceUpdate = globalSettings.getForceUpdate();
@@ -59,6 +60,7 @@ public class WhitesourceBuildStartContextProcessor implements BuildStartContextP
 
         for (SRunnerContext runnerContext : context.getRunnerContexts()) {
             safeAddRunnerParameter(runnerContext, Constants.RUNNER_ORGANIZATION_TOKEN, orgToken);
+            safeAddRunnerParameter(runnerContext, Constants.RUNNER_USER_KEY, userKey);
             safeAddRunnerParameter(runnerContext, Constants.RUNNER_SERVICE_URL, serviceUrl);
             safeAddRunnerParameter(runnerContext, Constants.RUNNER_CHECK_POLICIES, checkPolicies);
             safeAddRunnerParameter(runnerContext, Constants.RUNNER_FORCE_UPDATE, forceUpdate);
