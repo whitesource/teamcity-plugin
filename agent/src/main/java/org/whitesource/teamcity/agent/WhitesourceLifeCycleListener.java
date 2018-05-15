@@ -304,13 +304,11 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
         if (failOnError) {
             Loggers.AGENT.warn(WssUtils.logMsg(LOG_COMPONENT, "Stopping build"), e);
             logger.buildFailureDescription(errorMessage);
-            logger.exception(e);
             logger.flush();
             build.stopBuild(errorMessage);
         } else {
             logger.warning("Build won't fail, 'failOnError' parameter is set to false");
             logger.warning(errorMessage);
-            logger.exception(e);
             logger.flush();
         }
     }
