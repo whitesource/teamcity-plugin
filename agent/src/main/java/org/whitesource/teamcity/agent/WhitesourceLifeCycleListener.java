@@ -283,7 +283,6 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
 
     private void logUpdateResult(UpdateInventoryResult result, BuildProgressLogger logger) {
         Loggers.AGENT.info(WssUtils.logMsg(LOG_COMPONENT, "update success"));
-
         logger.message("White Source update results: ");
         logger.message("White Source organization: " + result.getOrganization());
         logger.message(result.getCreatedProjects().size() + " Newly created projects:");
@@ -294,7 +293,7 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
         // support token
         String requestToken = result.getRequestToken();
         if (StringUtils.isNotBlank(requestToken)) {
-            logger.message("Support Token: "+ requestToken);
+            logger.message("Support Token: " + requestToken);
         }
     }
 
@@ -310,6 +309,10 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
             logger.warning("Build won't fail, 'failOnError' parameter is set to false");
             logger.warning(errorMessage);
             logger.flush();
+        }
+
+        if (e instanceof WssServiceException) {
+            logger.message("Support Token: " + ((WssServiceException) e).getRequestToken());
         }
     }
 
@@ -351,7 +354,7 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
 
     private String getResource(String propertyName) {
         String val = (properties.getProperty(propertyName));
-        if(StringUtils.isNotBlank(val)){
+        if (StringUtils.isNotBlank(val)) {
             return val;
         }
         return "";
@@ -364,20 +367,18 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
             stream = WhitesourceLifeCycleListener.class.getResourceAsStream("/project.properties");
             properties.load(stream);
             stream.close();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             Loggers.AGENT.error("Failed to get version ", e);
-        }
-        finally {
+        } finally {
             closeStream(stream);
         }
         return properties;
     }
 
-    public void closeStream(Closeable s){
-        try{
-            if(s!=null)s.close();
-        }catch(IOException e){
+    public void closeStream(Closeable s) {
+        try {
+            if (s != null) s.close();
+        } catch (IOException e) {
             Loggers.AGENT.error("Failed to close stream ", e);
         }
     }
