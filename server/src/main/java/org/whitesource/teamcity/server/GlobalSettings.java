@@ -42,6 +42,10 @@ public class GlobalSettings {
 
     private int connectionTimeoutMinutes;
 
+    private int connectionRetries;
+
+    private int connectionRetriesInterval;
+
     /* --- Constructors--- */
 
     /**
@@ -121,5 +125,21 @@ public class GlobalSettings {
 
     public void setUserKey(String userKey) {
         this.userKey = userKey;
+    }
+
+    public int getConnectionRetries() {
+        return connectionRetries;
+    }
+
+    public void setConnectionRetries(int connectionRetries) {
+        this.connectionRetries = connectionRetries;
+    }
+
+    public int getConnectionRetriesInterval() {
+        return connectionRetriesInterval;
+    }
+
+    public void setConnectionRetriesInterval(int connectionRetriesInterval) {
+        this.connectionRetriesInterval = connectionRetriesInterval;
     }
 }

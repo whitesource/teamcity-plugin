@@ -170,6 +170,9 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
             }
             debugAgentProjectInfos(projectInfos);
 
+            String collectionRetries = runnerParameters.get(Constants.RUNNER_CONNECTION_RETRIES);
+            String collectionRetriesInterval = runnerParameters.get(Constants.RUNNER_CONNECTION_RETRIES_INTERVAL);
+
             // send to white source
             if (CollectionUtils.isEmpty(projectInfos)) {
                 buildLogger.message("No open source information found.");
@@ -194,13 +197,13 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
                                     " were force updated to organization inventory." :
                                     "All dependencies conform with open source policies.";
                             buildLogger.message(message);
-                            sendUpdate(orgToken, product, productVersion, projectInfos, service, buildLogger, userKey);
+                            sendUpdate(orgToken, product, productVersion, projectInfos, service, buildLogger, userKey, collectionRetries, collectionRetriesInterval);
                             if (failOnError) {
                                 stopBuild((AgentRunningBuildEx) build, "Build failed due to policy violations.");
                             }
                         }
                     } else {
-                        sendUpdate(orgToken, product, productVersion, projectInfos, service, buildLogger, userKey);
+                        sendUpdate(orgToken, product, productVersion, projectInfos, service, buildLogger, userKey, collectionRetries, collectionRetriesInterval);
                     }
                 } catch (WssServiceException e) {
                     stopBuildOnError((AgentRunningBuildEx) build, e, failOnError);
@@ -273,12 +276,57 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
     }
 
     private void sendUpdate(String orgToken, String product, String productVersion, Collection<AgentProjectInfo> projectInfos,
-                            WhitesourceService service, BuildProgressLogger buildLogger, String userKey)
+                            WhitesourceService service, BuildProgressLogger buildLogger, String userKey,
+                            String collectionRetries, String collectionRetriesInterval)
             throws WssServiceException {
 
         buildLogger.message("Sending to White Source");
-        UpdateInventoryResult updateResult = service.update(orgToken, product, productVersion, projectInfos, userKey);
-        logUpdateResult(updateResult, buildLogger);
+
+        int retries = 1;
+        if(StringUtils.isNumeric(collectionRetries)) {
+            retries = Integer.parseInt(collectionRetries);
+        }
+
+        int interval = 3;
+        if(StringUtils.isNumeric(collectionRetriesInterval)) {
+            interval = Integer.parseInt(collectionRetriesInterval);
+        }
+
+        UpdateInventoryResult updateResult = null;
+        while (retries-- > -1) {
+            try {
+                updateResult = service.update(orgToken, product, productVersion, projectInfos, userKey);
+                if(updateResult != null) {
+                    break;
+                }
+            } catch (WssServiceException e) {
+                buildLogger.error("Failed to send request to WhiteSource server: " + e.getMessage());
+                if (e.getCause() != null &&
+                        e.getCause().getClass().getCanonicalName().substring(0, e.getCause().getClass().getCanonicalName().lastIndexOf(Constants.DOT)).equals(Constants.JAVA_NETWORKING)) {
+                    //statusCode = StatusCode.CONNECTION_FAILURE;
+                    buildLogger.error("Trying " + (retries + 1) + " more time" + (retries != 0 ? "s" : Constants.EMPTY_STRING));
+                } else {
+                    //statusCode = StatusCode.SERVER_FAILURE;
+                    retries = -1;
+                }
+
+                if (retries > -1) {
+                    try {
+                        Thread.sleep(interval*1000);
+                    } catch (InterruptedException e1) {
+                        buildLogger.error("Failed to sleep while retrying to connect to server " + e1.getMessage());
+                    }
+                }
+            }
+        }
+        if (updateResult != null) {
+            logUpdateResult(updateResult, buildLogger);
+        } else {
+            throw new WssServiceException("Connection Failed");
+        }
+
+        //UpdateInventoryResult updateResult = service.update(orgToken, product, productVersion, projectInfos, userKey);
+        //logUpdateResult(updateResult, buildLogger);
     }
 
     private void logUpdateResult(UpdateInventoryResult result, BuildProgressLogger logger) {
@@ -312,7 +360,11 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
         }
 
         if (e instanceof WssServiceException) {
-            logger.message("Support Token: " + ((WssServiceException) e).getRequestToken());
+            // support token
+            String requestToken = ((WssServiceException) e).getRequestToken();
+            if (StringUtils.isNotBlank(requestToken)) {
+                logger.message("Support Token: " + requestToken);
+            }
         }
     }
 

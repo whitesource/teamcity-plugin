@@ -83,6 +83,16 @@ public class GlobalSettingsController extends BaseFormXmlController {
             settings.setConnectionTimeoutMinutes(Integer.parseInt(connectionTimeoutMinutes));
         }
 
+        String connectionRetries = request.getParameter("connectionRetries");
+        if (StringUtil.isNumber(connectionRetries)) {
+            settings.setConnectionRetries(Integer.parseInt(connectionRetries));
+        }
+
+        String connectionRetriesInterval = request.getParameter("connectionRetriesInterval");
+        if (StringUtil.isNumber(connectionRetriesInterval)) {
+            settings.setConnectionRetriesInterval(Integer.parseInt(connectionRetriesInterval));
+        }
+
         String proxyHost = request.getParameter("proxyHost");
         if (!StringUtil.isEmptyOrSpaces(proxyHost)){
             ProxySettings proxy = new ProxySettings();
@@ -130,6 +140,30 @@ public class GlobalSettingsController extends BaseFormXmlController {
                 }
             } else {
                 errors.addError("invalidConnectionTimeoutMinutes", "Connection Timeout must be a valid number");
+            }
+        }
+
+        String connectionRetriesString = request.getParameter("connectionRetries");
+        if (!StringUtil.isEmptyOrSpaces(connectionRetriesString)) {
+            if (StringUtil.isNumber(connectionRetriesString)) {
+                final int connectionRetries = Integer.parseInt(connectionRetriesString);
+                if (connectionRetries < 0) {
+                    errors.addError("invalidConnectionRetries", "Connection Retries must be zero or more");
+                }
+            } else {
+                errors.addError("invalidConnectionRetries", "Connection Retries must be a valid number");
+            }
+        }
+
+        String connectionRetriesIntervalString = request.getParameter("connectionRetriesInterval");
+        if (!StringUtil.isEmptyOrSpaces(connectionRetriesIntervalString)) {
+            if (StringUtil.isNumber(connectionRetriesIntervalString)) {
+                final int connectionRetriesInterval = Integer.parseInt(connectionRetriesIntervalString);
+                if (connectionRetriesInterval < 0) {
+                    errors.addError("invalidConnectionRetriesInterval", "Connection Retries Interval must be zero or more");
+                }
+            } else {
+                errors.addError("invalidConnectionRetriesInterval", "Connection Retries Interval must be a valid number");
             }
         }
 

@@ -54,7 +54,8 @@ public final class Constants {
     public static final String RUNNER_PROXY_PASSWORD = PLUGIN_PREFIX + "proxyPassword";
     public static final String RUNNER_SERVICE_URL = PLUGIN_PREFIX + "serviceUrl";
     public static final String RUNNER_CONNECTION_TIMEOUT_MINUTES = PLUGIN_PREFIX + "connectionTimeoutMinutes";
-
+    public static final String RUNNER_CONNECTION_RETRIES = PLUGIN_PREFIX + "connectionRetries";
+    public static final String RUNNER_CONNECTION_RETRIES_INTERVAL = PLUGIN_PREFIX + "connectionRetriesInterval";
 
     /* --- Runner types --- */
 
@@ -69,6 +70,11 @@ public final class Constants {
     public static final String RUNNER_IDEA = "JPS";
     public static final String RUNNER_VS_SOLUTION = "VS.Solution";
     public static final String RUNNER_VS_SLN2003 = "sln2003";
+
+    /* --- Other settings --- */
+    public static final String DOT = ".";
+    public static final String JAVA_NETWORKING = "java.net";
+    public static final String EMPTY_STRING = "";
 
     /* --- Private constructor --- */
 

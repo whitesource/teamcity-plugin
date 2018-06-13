@@ -51,6 +51,16 @@
                     SettingsForm.highlightErrorField($("connectionTimeoutMinutes"));
                 },
 
+                onInvalidConnectionRetriesError: function (elem) {
+                    $("invalidConnectionRetries").innerHTML = elem.firstChild.nodeValue;
+                    SettingsForm.highlightErrorField($("connectionRetries"));
+                },
+
+                onInvalidConnectionRetriesIntervalError: function (elem) {
+                    $("invalidConnectionRetriesInterval").innerHTML = elem.firstChild.nodeValue;
+                    SettingsForm.highlightErrorField($("connectionRetriesInterval"));
+                },
+
                 onInvalidProxyPortError: function (elem) {
                     $("invalidProxyPort").innerHTML = elem.firstChild.nodeValue;
                     SettingsForm.highlightErrorField($("proxyPort"));
@@ -218,6 +228,47 @@
                         <div class="smallNote" style="margin-left: 0;">
                             <span class="error" id="invalidConnectionTimeoutMinutes"></span>
                             Optional. Default value is 60 min. Connection timeout is measured in minutes.
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        <label for="connectionRetries">
+                            Connection Retries
+                        </label>
+                    </th>
+                    <td>
+                        <c:set var="connectionRetries" value=""/>
+                        <c:if test="${settingsManager.globalSettings.connectionRetries > -1}">
+                            <c:set var="connectionRetries"
+                                   value="${settingsManager.globalSettings.connectionRetries}"/>
+                        </c:if>
+                        <forms:textField name="connectionRetries" value="${connectionRetries}"
+                                         style="width:300px;" size="255"/>
+                        <div class="smallNote" style="margin-left: 0;">
+                            <span class="error" id="invalidConnectionRetries"></span>
+                            Optional. Default value is 1.
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>
+                        <label for="connectionRetriesInterval">
+                            Connection Retries Interval
+                        </label>
+                    </th>
+                    <td>
+                        <c:set var="connectionRetriesInterval" value=""/>
+                        <c:if test="${settingsManager.globalSettings.connectionRetriesInterval > -1}">
+                            <c:set var="connectionRetriesInterval"
+                                   value="${settingsManager.globalSettings.connectionRetriesInterval}"/>
+                        </c:if>
+                        <forms:textField name="connectionRetriesInterval" value="${connectionRetriesInterval}"
+                                         style="width:300px;" size="255"/>
+                        <div class="smallNote" style="margin-left: 0;">
+                            <span class="error" id="invalidConnectionRetriesInterval"></span>
+                            Optional. Default value is 3. Interval value is measured in seconds.
                         </div>
                     </td>
                 </tr>

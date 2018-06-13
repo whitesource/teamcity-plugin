@@ -57,6 +57,8 @@ public class WhitesourceBuildStartContextProcessor implements BuildStartContextP
 //        boolean checkPolicies = globalSettings.isCheckPolicies();
         ProxySettings proxy = globalSettings.getProxy();
         int connectionTimeoutMinutes = globalSettings.getConnectionTimeoutMinutes();
+        int connectionRetries = globalSettings.getConnectionRetries();
+        int connectionRetriesInterval = globalSettings.getConnectionRetriesInterval();
 
         for (SRunnerContext runnerContext : context.getRunnerContexts()) {
             safeAddRunnerParameter(runnerContext, Constants.RUNNER_ORGANIZATION_TOKEN, orgToken);
@@ -67,6 +69,8 @@ public class WhitesourceBuildStartContextProcessor implements BuildStartContextP
             safeAddRunnerParameter(runnerContext, Constants.RUNNER_FAIL_ON_ERROR, failOnError);
 //            safeAddRunnerParameter(runnerContext, Constants.RUNNER_CHECK_POLICIES, Boolean.toString(checkPolicies));
             safeAddRunnerParameter(runnerContext, Constants.RUNNER_CONNECTION_TIMEOUT_MINUTES, Integer.valueOf(connectionTimeoutMinutes).toString());
+            safeAddRunnerParameter(runnerContext, Constants.RUNNER_CONNECTION_RETRIES, Integer.valueOf(connectionRetries).toString());
+            safeAddRunnerParameter(runnerContext, Constants.RUNNER_CONNECTION_RETRIES_INTERVAL, Integer.valueOf(connectionRetriesInterval).toString());
 
             if (proxy != null) {
                 safeAddRunnerParameter(runnerContext, Constants.RUNNER_PROXY_HOST, proxy.getHost());
