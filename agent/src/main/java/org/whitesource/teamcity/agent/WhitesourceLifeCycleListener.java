@@ -58,6 +58,8 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
     private static final String VERSION = "version";
     private static final String TRUE = "true";
     private static final String SKIP_WHITESOURCE_PLUGIN = "SKIP_WHITESOURCE_PLUGIN";
+    public static final String AGENT_KEYWORD = "agent";
+    public static final String SLASH = "/";
     private final Properties properties;
 
     private ExtensionHolder extensionHolder;
@@ -252,11 +254,14 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
         Map<String, String> runnerParameters = runner.getRunnerParameters();
         String url = runnerParameters.get(Constants.RUNNER_SERVICE_URL);
         if (!StringUtil.isEmptyOrSpaces(url)){
-            if (!url.endsWith("/")) {
-                url += "/";
+            if (!url.endsWith(AGENT_KEYWORD)) {
+                if (!url.endsWith(SLASH)) {
+                    url += SLASH;
+                }
+                url += AGENT_KEYWORD;
             }
-            url += "agent";
         }
+
         String proxyHost = runnerParameters.get(Constants.RUNNER_PROXY_HOST);
         boolean setProxy = !StringUtil.isEmptyOrSpaces(proxyHost) ? true : false;
         int connectionTimeoutMinutes = Integer.parseInt(runnerParameters.get(Constants.RUNNER_CONNECTION_TIMEOUT_MINUTES));
@@ -301,6 +306,7 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
                 }
             } catch (WssServiceException e) {
                 buildLogger.error("Failed to send request to WhiteSource server: " + e.getMessage());
+                //  "Bad Request error message could be caused by WhiteSource configurations in Jenkins:Configure System, please make sure configurations are alright"
                 if (e.getCause() != null &&
                         e.getCause().getClass().getCanonicalName().substring(0, e.getCause().getClass().getCanonicalName().lastIndexOf(Constants.DOT)).equals(Constants.JAVA_NETWORKING)) {
                     //statusCode = StatusCode.CONNECTION_FAILURE;
