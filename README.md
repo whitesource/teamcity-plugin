@@ -11,7 +11,7 @@ Once set up, all usage of open source software in the organization will be conti
 * New projects will be created
 * Existing projects will be updated
 * Policies will be enforced on every action, failing the build if necessary.
-
+ 
 Check the [online documentation][3] for instructions and screencasts on how to use the plugin.
 Technical information about the plugin could be found [here][6].
 
