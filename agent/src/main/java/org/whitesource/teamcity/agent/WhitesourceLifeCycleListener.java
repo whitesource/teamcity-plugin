@@ -24,7 +24,9 @@ import jetbrains.buildServer.util.StringUtil;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.util.CollectionUtils;
+import org.whitesource.agent.api.dispatch.CheckPolicyComplianceRequest;
 import org.whitesource.agent.api.dispatch.CheckPolicyComplianceResult;
+import org.whitesource.agent.api.dispatch.UpdateInventoryRequest;
 import org.whitesource.agent.api.dispatch.UpdateInventoryResult;
 import org.whitesource.agent.api.model.AgentProjectInfo;
 import org.whitesource.agent.api.model.DependencyInfo;
@@ -183,7 +185,12 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
                 try {
                     if (shouldCheckPolicies) {
                         buildLogger.message("Checking policies");
-                        CheckPolicyComplianceResult result = service.checkPolicyCompliance(orgToken, product, productVersion, projectInfos, checkAllLibraries, userKey);
+                        CheckPolicyComplianceRequest checkPolicyComplianceRequest = new CheckPolicyComplianceRequest(orgToken,projectInfos,checkAllLibraries);
+                        checkPolicyComplianceRequest.setProduct(product);
+                        checkPolicyComplianceRequest.setProductVersion(productVersion);
+                        checkPolicyComplianceRequest.setUserKey(userKey);
+                        CheckPolicyComplianceResult result = service.checkPolicyCompliance(checkPolicyComplianceRequest);
+                                //checkPolicyCompliance(orgToken, product, productVersion, projectInfos, checkAllLibraries, userKey);
                         policyCheckReport(runner, result);
                         boolean hasRejections = result.hasRejections();
                         String message;
@@ -300,7 +307,9 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
         UpdateInventoryResult updateResult = null;
         while (retries-- > -1) {
             try {
-                updateResult = service.update(orgToken, product, productVersion, projectInfos, userKey);
+                UpdateInventoryRequest updateInventoryRequest = new UpdateInventoryRequest(orgToken,product,productVersion,projectInfos,userKey,null);
+                updateResult = service.update(updateInventoryRequest);
+                        //update(orgToken, product, productVersion, projectInfos, userKey);
                 if(updateResult != null) {
                     break;
                 }
