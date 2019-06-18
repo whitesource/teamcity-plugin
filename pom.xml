@@ -4,7 +4,7 @@
 
     <groupId>org.whitesource.teamcity</groupId>
     <artifactId>parent</artifactId>
-    <version>18.10.1-SNAPSHOT</version>
+    <version>19.5.3-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>White Source TeamCity plugin</name>
