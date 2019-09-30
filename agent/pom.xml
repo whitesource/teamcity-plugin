@@ -12,7 +12,7 @@
     <name>Agent</name>
 
     <properties>
-        <agents.version>18.4.1</agents.version>
+        <agents.version>2.9.9.20</agents.version>
     </properties>
 
     <dependencies>
@@ -94,8 +94,11 @@
             <groupId>org.jdom</groupId>
             <artifactId>jdom</artifactId>
         </dependency>
-
-
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.4</version>
+        </dependency>
         <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>

@@ -16,12 +16,13 @@
 package org.whitesource.teamcity.agent;
 
 import com.intellij.openapi.diagnostic.Logger;
+import freemarker.template.TemplateException;
 import jetbrains.buildServer.ExtensionHolder;
 import jetbrains.buildServer.agent.*;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.util.EventDispatcher;
 import jetbrains.buildServer.util.StringUtil;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.util.CollectionUtils;
 import org.whitesource.agent.api.dispatch.CheckPolicyComplianceRequest;
@@ -40,7 +41,10 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * @author Edo.Shor
@@ -221,6 +225,8 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
                 } catch (RuntimeException e) {
                     Loggers.AGENT.error(WssUtils.logMsg(LOG_COMPONENT, "Runtime Error"), e);
                     stopBuildOnError((AgentRunningBuildEx) build, e, failOnError);
+                } catch (TemplateException e) {
+                    stopBuildOnError((AgentRunningBuildEx) build, e, failOnError);
                 } finally {
                     service.shutdown();
                 }
@@ -240,7 +246,7 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
         return doFailOnError;
     }
 
-    private void policyCheckReport(BuildRunnerContext runner, CheckPolicyComplianceResult result) throws IOException {
+    private void policyCheckReport(BuildRunnerContext runner, CheckPolicyComplianceResult result) throws IOException, TemplateException {
         AgentRunningBuild build = runner.getBuild();
 
         PolicyCheckReport report = new PolicyCheckReport(result, build.getProjectName(), build.getBuildNumber());
