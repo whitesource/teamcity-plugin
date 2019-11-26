@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2012 White Source Ltd.
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -107,7 +107,9 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
         AgentRunningBuild build = runner.getBuild();
         Loggers.AGENT.info(WssUtils.logMsg(LOG_COMPONENT, "runner finished " + build.getProjectName() + " type " + runner.getName()));
 
-        if (!shouldUpdate(runner)) { return; } // no need to update white source...
+        if (!shouldUpdate(runner)) {
+            return;
+        } // no need to update white source...
 
         final BuildProgressLogger buildLogger = build.getBuildLogger();
         String skipWhiteSource = runner.getBuildParameters().getEnvironmentVariables().get(SKIP_WHITESOURCE_PLUGIN);
@@ -189,13 +191,13 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
                 try {
                     if (shouldCheckPolicies) {
                         buildLogger.message("Checking policies");
-                        CheckPolicyComplianceRequest checkPolicyComplianceRequest = new CheckPolicyComplianceRequest(orgToken,projectInfos,checkAllLibraries);
+                        CheckPolicyComplianceRequest checkPolicyComplianceRequest = new CheckPolicyComplianceRequest(orgToken, projectInfos, checkAllLibraries);
                         checkPolicyComplianceRequest.setProduct(product);
                         checkPolicyComplianceRequest.setProductVersion(productVersion);
                         checkPolicyComplianceRequest.setUserKey(userKey);
                         CheckPolicyComplianceResult result = service.checkPolicyCompliance(checkPolicyComplianceRequest);
-                                //checkPolicyCompliance(orgToken, product, productVersion, projectInfos, checkAllLibraries, userKey);
-                        policyCheckReport(runner, result);
+                        //checkPolicyCompliance(orgToken, product, productVersion, projectInfos, checkAllLibraries, userKey);
+                        policyCheckReport(runner, result, buildLogger);
                         boolean hasRejections = result.hasRejections();
                         String message;
                         if (hasRejections && !isForceUpdate) {
@@ -246,16 +248,26 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
         return doFailOnError;
     }
 
-    private void policyCheckReport(BuildRunnerContext runner, CheckPolicyComplianceResult result) throws IOException, TemplateException {
+    private void policyCheckReport(BuildRunnerContext runner, CheckPolicyComplianceResult result, BuildProgressLogger buildLogger) throws IOException, TemplateException {
         AgentRunningBuild build = runner.getBuild();
-
         PolicyCheckReport report = new PolicyCheckReport(result, build.getProjectName(), build.getBuildNumber());
         File reportArchive = report.generate(build.getBuildTempDirectory(), true);
-
-        ArtifactsPublisher publisher = extensionHolder.getExtensions(ArtifactsPublisher.class).iterator().next();
-        Map<File, String> artifactsToPublish = new HashMap<File, String>();
-        artifactsToPublish.put(reportArchive, "");
-        publisher.publishFiles(artifactsToPublish);
+        Collection<ArtifactsPublisher> publishers = extensionHolder.getExtensions(ArtifactsPublisher.class);
+        buildLogger.message("Found: " + publishers.size() + " Artifact Publishers");
+        int index = 0;
+        for (ArtifactsPublisher publisher : publishers) {
+            try {
+                index++;
+                buildLogger.message("Trying publisher #" + String.valueOf(index) + " : " + publisher.getClass().getName());
+                Map<File, String> artifactsToPublish = new HashMap<File, String>();
+                artifactsToPublish.put(reportArchive, "");
+                publisher.publishFiles(artifactsToPublish);
+                buildLogger.message("Successfully saved report file in artifact publisher");
+                return;
+            } catch (Exception e) {
+                buildLogger.message("Publisher number #" + String.valueOf(index) + " failed with exception:" + e.getMessage());
+            }
+        }
     }
 
     private boolean shouldUpdate(BuildRunnerContext runner) {
@@ -266,7 +278,7 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
     private WhitesourceService createServiceClient(BuildRunnerContext runner) {
         Map<String, String> runnerParameters = runner.getRunnerParameters();
         String url = runnerParameters.get(Constants.RUNNER_SERVICE_URL);
-        if (!StringUtil.isEmptyOrSpaces(url)){
+        if (!StringUtil.isEmptyOrSpaces(url)) {
             if (!url.endsWith(AGENT_KEYWORD)) {
                 if (!url.endsWith(SLASH)) {
                     url += SLASH;
@@ -280,7 +292,7 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
         int connectionTimeoutMinutes = Integer.parseInt(runnerParameters.get(Constants.RUNNER_CONNECTION_TIMEOUT_MINUTES));
 
 
-        WhitesourceService service = new WhitesourceService(Constants.AGENT_TYPE, getAgentsVersion() ,getPluginVersion(),  url,
+        WhitesourceService service = new WhitesourceService(Constants.AGENT_TYPE, getAgentsVersion(), getPluginVersion(), url,
                 setProxy, connectionTimeoutMinutes);
 
         if (!StringUtil.isEmptyOrSpaces(proxyHost)) {
@@ -301,22 +313,22 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
         buildLogger.message("Sending to White Source");
 
         int retries = 1;
-        if(StringUtils.isNumeric(collectionRetries)) {
+        if (StringUtils.isNumeric(collectionRetries)) {
             retries = Integer.parseInt(collectionRetries);
         }
 
         int interval = 3;
-        if(StringUtils.isNumeric(collectionRetriesInterval)) {
+        if (StringUtils.isNumeric(collectionRetriesInterval)) {
             interval = Integer.parseInt(collectionRetriesInterval);
         }
 
         UpdateInventoryResult updateResult = null;
         while (retries-- > -1) {
             try {
-                UpdateInventoryRequest updateInventoryRequest = new UpdateInventoryRequest(orgToken,product,productVersion,projectInfos,userKey,null);
+                UpdateInventoryRequest updateInventoryRequest = new UpdateInventoryRequest(orgToken, product, productVersion, projectInfos, userKey, null);
                 updateResult = service.update(updateInventoryRequest);
-                        //update(orgToken, product, productVersion, projectInfos, userKey);
-                if(updateResult != null) {
+                //update(orgToken, product, productVersion, projectInfos, userKey);
+                if (updateResult != null) {
                     break;
                 }
             } catch (WssServiceException e) {
@@ -333,7 +345,7 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
 
                 if (retries > -1) {
                     try {
-                        Thread.sleep(interval*1000);
+                        Thread.sleep(interval * 1000);
                     } catch (InterruptedException e1) {
                         buildLogger.error("Failed to sleep while retrying to connect to server " + e1.getMessage());
                     }
