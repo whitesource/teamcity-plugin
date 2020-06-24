@@ -211,7 +211,7 @@ public class WhitesourceLifeCycleListener extends AgentLifeCycleAdapter {
                                     "All dependencies conform with open source policies.";
                             buildLogger.message(message);
                             sendUpdate(orgToken, product, productVersion, projectInfos, service, buildLogger, userKey, collectionRetries, collectionRetriesInterval);
-                            if (failOnError) {
+                            if (failOnError && hasRejections) {
                                 stopBuild((AgentRunningBuildEx) build, "Build failed due to policy violations.");
                             }
                         }

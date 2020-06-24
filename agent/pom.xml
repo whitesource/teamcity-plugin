@@ -5,14 +5,14 @@
     <parent>
         <groupId>org.whitesource.teamcity</groupId>
         <artifactId>parent</artifactId>
-        <version>19.9.2.1-SNAPSHOT</version>
+        <version>20.6.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>agent</artifactId>
     <name>Agent</name>
 
     <properties>
-        <agents.version>2.9.9.20</agents.version>
+        <agents.version>2.9.9.51</agents.version>
     </properties>
 
     <dependencies>
