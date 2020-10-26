@@ -4,7 +4,7 @@
 
     <groupId>org.whitesource.teamcity</groupId>
     <artifactId>parent</artifactId>
-    <version>20.6.2-SNAPSHOT</version>
+    <version>20.10.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>White Source TeamCity plugin</name>
@@ -177,7 +177,7 @@
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-                <version>4.10</version>
+                <version>4.13.1</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
